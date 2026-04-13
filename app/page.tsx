@@ -36,7 +36,7 @@ export default function Page() {
 
           <div className="flex gap-4 mt-6">
             <button className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700">
-              Mulai Kirim →
+              Mulai Kirim
             </button>
           </div>
 
