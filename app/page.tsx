@@ -38,9 +38,6 @@ export default function Page() {
             <button className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700">
               Mulai Kirim →
             </button>
-            <button className="border border-gray-400 px-6 py-3 rounded-full hover:bg-gray-200">
-              Pelajari Layanan
-            </button>
           </div>
 
           {/* Statistics */}
