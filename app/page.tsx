@@ -14,10 +14,6 @@ export default function Page() {
             PaketinAja
           </span>
         </div>
-
-        <button className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700">
-          Sign In
-        </button>
       </div>
 
       {/* Hero Section */}
@@ -36,7 +32,7 @@ export default function Page() {
 
           <div className="flex gap-4 mt-6">
             <button className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700">
-              Mulai Kirim
+              Sign In
             </button>
           </div>
 
@@ -89,7 +85,7 @@ export default function Page() {
             rel="noopener noreferrer"
             className="block text-base md:text-lg text-gray-600 hover:underline"
           >
-            Jl. Babarsari No.43, Janti, Caturtunggal, Kec. Depok, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55281          
+            Jl. Babarsari No.43, Janti, Caturtunggal, Kec. Depok, Kabupaten Sleman, Daerah Istimewa Yogyakarta          
           </a>
           <a 
             href="https://wa.me/6285290002222"
