@@ -23,7 +23,7 @@ export default function Page() {
 
           <h1 className="text-5xl md:text-6xl font-bold text-emerald-950 mb-4 leading-tight">
             Kirim Paket <span className="text-green-600">Lebih Mudah</span><br />
-            Bareng PaketinAja
+            Bareng <span className="text-green-600">PaketinAja</span><br />
           </h1>
 
           <p className="text-base md:text-lg text-gray-600 max-w-md">
