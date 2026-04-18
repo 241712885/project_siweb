@@ -30,7 +30,7 @@ export default function Dashboard() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
             {open && (
                 <div
                     className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
@@ -65,15 +65,15 @@ export default function Dashboard() {
                     </div>
 
                     {/* Logout */}
-                    <button className="text-red-500 text-left text-sm">Keluar</button>
+                    <button className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
                 </div>
             </div>
 
             {/* Main */}
             <div className={`transition-all duration-300 ${open ? 'blur-sm' : ''}`}>
-                <div className="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
+                <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
                     <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                        <img src="/humbergerMenu.jpeg" alt="menu" className="w-6 h-6 object-contain" />
+                        <img src="/humbergerMenu.png" alt="menu" className="w-8 h- object-contain" />
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -84,8 +84,8 @@ export default function Dashboard() {
                 </div>
                 
                 {/* Content */}
-                <div className="px-10 py-10">
-                    <div className="text-center mb-12">
+                <div className="px-10 py-10 space-y-6">
+                    <div className="text-center">
                         <h1 className="text-3xl md:text-4xl font-semibold text-emerald-950">Selamat Datang, Imanuella 👋</h1>
                         <p className="text-gray-600 mt-2 text-base md:text-lg">Lacak paketmu dengan mudah, cepat, dan tanpa ribet</p>
                     </div>
@@ -114,12 +114,10 @@ export default function Dashboard() {
 
                     <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                         {features.map((item, i) => (
-                            <div key={i} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition flex items-start gap-4">
-                                <img src={item.icon} alt={item.title} className="w-10 h-10 object-contain" />
-                                <div>
-                                    <h3 className="font-semibold mb-1">{item.title}</h3>
-                                    <p className="text-gray-600 text-sm">{item.description}</p>
-                                </div>
+                            <div key={i} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                                <img src={item.icon} alt={item.title} className="w-10 h-10 object-contain mb-4" />
+                                <h3 className="font-semibold text-gray-800 mb-1 text-left">{item.title}</h3>
+                                <p className="text-gray-500 text-sm text-left">{item.description}</p>
                             </div>
                         ))}
                     </div>
