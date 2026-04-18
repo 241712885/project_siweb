@@ -19,6 +19,9 @@ const config: Config = {
         },
       },
     },
+    fontFamily: {
+      sans: ['Poppins', 'sans-serif'],
+    },
     keyframes: {
       shimmer: {
         '100%': {
