@@ -44,16 +44,22 @@ export default function Dashboard() {
                 ${open ? 'translate-x-0' : '-translate-x-full'}`}
             >  
                 <div className="p-6 flex flex-col h-full">
-                    <div className="flex items-center gap-3 mb-10">
-                        <img src="/LogoPaketinAja.jpeg" className="w-10 h-10 rounded-full object-contain" />
-                        <span className="text-green-700 font-semibold text-lg">PaketinAja</span>
+                    <div className="flex items-start gap-3 mb-10">
+                        <div className="flex flex-col">
+                            <span className="text-green-700 font-semibold text-lg">
+                                PaketinAja
+                            </span>
+                            <span className="text-gray-700 text-sm">
+                                Kirim mudah, cepat, dan aman
+                            </span>
+                        </div>
                     </div>
 
                     {/* Menu */}
                     <div className="space-y-2 flex-1">
                         <button onClick={menuClicked} className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">Beranda</button>
                         
-                        {["Lacak", "Riwayat", "Profil"].map((item) => (
+                        {["Beranda", "Riwayat", "Profil"].map((item) => (
                             <button 
                                 key={item}
                                 onClick={menuClicked}
