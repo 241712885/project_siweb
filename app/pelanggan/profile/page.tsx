@@ -226,7 +226,10 @@ export default function ProfilePage() {
 
             {/* BUTTON BAWAH */}
             <div className="max-w-xl w-full mt-6 flex flex-col gap-3">
-              <button className="bg-green-300 text-black py-3 rounded-lg">
+              <button 
+                onClick={() => router.push("/admin/beranda")}
+                className="bg-green-300 text-black py-3 rounded-lg hover:bg-green-400"
+              >
                 Masuk Halaman Admin
               </button>
               <button className="border border-red-500 text-red-500 py-3 rounded-lg">

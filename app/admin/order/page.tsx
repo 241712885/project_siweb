@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function OrderManagement() {
     const [open, setOpen] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const router = useRouter();
+    const [resi, setResi] = useState("");
     const [form, setForm] = useState({
         senderName: "",
         senderPhone: "",
@@ -28,12 +31,20 @@ export default function OrderManagement() {
         if (!form.senderName) error.senderName = "Nama pengirim wajib diisi";
         if (!form.senderPhone) error.senderPhone = "Nomor telepon wajib diisi";
         if (!/^\d+$/.test(form.senderPhone)) error.senderPhone = "Nomor telepon tidak valid";
-        if (!form.senderAddress || form.senderAddress.split(",").length < 3) error.senderAddress = "Alamat belum lengkap";
-        
+        if (!form.senderAddress) {
+            error.senderAddress = "Alamat pengirim wajib diisi";
+        } else if (form.senderAddress.split(",").length < 3) {
+            error.senderAddress = "Alamat harus lengkap (minimal: jalan, kota, provinsi)";
+        }
+
         if (!form.receiverName) error.receiverName = "Nama penerima wajib diisi";
         if (!form.receiverPhone) error.receiverPhone = "Nomor telepon wajib diisi";
         if (!/^\d+$/.test(form.receiverPhone)) error.receiverPhone = "Nomor telepon tidak valid";
-        if (!form.receiverAddress || form.receiverAddress.split(",").length < 3) error.receiverAddress = "Alamat belum lengkap";
+        if (!form.receiverAddress) {
+            error.receiverAddress = "Alamat penerima wajib diisi";
+        } else if (form.receiverAddress.split(",").length < 3) {
+            error.receiverAddress = "Alamat harus lengkap (minimal: jalan, kota, provinsi)";
+        }
 
         if (!form.weight || Number(form.weight) < 1) error.weight = "Minimal 1 kg";
         if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) error.email = "Format email salah";
@@ -46,8 +57,34 @@ export default function OrderManagement() {
 
     const handleSubmit = () => {
         if (validate()) {
+            const randomNumber = Math.floor(199 + Math.random() * 900);
+            const generatedResi = `CRG-2026${randomNumber}`;
+            setResi(generatedResi);
             setShowSuccess(true);
         }
+    };
+
+    const getPricePerKg = () => {
+    switch (form.type) {
+        case "Paket Kecil":
+            return 10000;
+        case "Paket Sedang":
+            return 15000;
+        case "Paket Besar":
+            return 20000;
+        default:
+            return 10000;
+        }
+    };
+
+    const totalPrice = () => {
+        const weight = Number(form.weight);
+        if (!weight || weight < 1) return 0;
+        return weight * getPricePerKg();
+    };
+
+    const formatRupiah = (number: number) => {
+        return "Rp " + number.toLocaleString("id-ID");
     };
 
     const [active, setActive] = useState("Pemesanan");
@@ -78,30 +115,49 @@ export default function OrderManagement() {
                         </div>
                     </div>
 
+                    {/* Menu */}
                     <div className="space-y-2 flex-1">
-                        {["Beranda", "Pemesanan", "Pengiriman"].map((item) => (
                         <button 
-                            key={item} 
                             onClick={() => {
-                                setActive(item);
+                                router.push("/admin/beranda");
                                 setOpen(false);
                             }}
-                            className={`w-full text-left px-4 py-2 rounded-lg ${active === item ? 'bg-green-600 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
+                            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                         >
-                                {item}
-                            </button>
-                        ))}
+                            Beranda
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                router.push("/admin/order");
+                                setOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
+                        >
+                            Pemesanan
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                router.push("/admin/pengiriman");
+                                setOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
+                        >
+                            Pengiriman
+                        </button>
                     </div>
 
+                    {/* Logout */}
                     <button className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
                 </div>
             </div>
-            
+
             {/* Main */}
             <div className={`transition-all duration-300 ${open ? 'blur-sm' : ''}`}>
                 <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
                     <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                        <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8 object-contain" />
+                        <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -120,26 +176,26 @@ export default function OrderManagement() {
                             <h2 className="font-semibold mb-4 text-green-700">Data Pengirim</h2>
 
                             <input name="senderName" placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.senderName}</p>
+                            <p className="text-red-500 text-sm">{errors.senderName}</p>
 
                             <input name="senderPhone" placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.senderPhone}</p>
+                            <p className="text-red-500 text-sm">{errors.senderPhone}</p>
 
                             <textarea name="senderAddress" placeholder="Alamat Lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.senderAddress}</p>
+                            <p className="text-red-500 text-sm">{errors.senderAddress}</p>
                         </div>
 
                         <div className="bg-white p-6 rounded-2xl shadow space-y-2">
                             <h2 className="font-semibold mb-4 text-green-700">Data Penerima</h2>
 
                             <input name="receiverName" placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.receiverName}</p>
+                            <p className="text-red-500 text-sm">{errors.receiverName}</p>
 
                             <input name="receiverPhone" placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.receiverPhone}</p>
+                            <p className="text-red-500 text-sm">{errors.receiverPhone}</p>
 
                             <textarea name="receiverAddress" placeholder="Alamat lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
-                            <p className="error">{errors.receiverAddress}</p>
+                            <p className="text-red-500 text-sm">{errors.receiverAddress}</p>
                         </div>
                     </div>
 
@@ -184,7 +240,7 @@ export default function OrderManagement() {
                                 <div>
                                     <label className="text-sm text-gray-600">Total Harga</label>
                                     <input
-                                        value="Rp 100.000"
+                                        value={formatRupiah(totalPrice())}
                                         readOnly
                                         className="w-full px-3 py-2 rounded-lg border border-gray-300 h-20 resize-none focus:ring-2 focus:ring-green-500"
                                     />
@@ -219,7 +275,11 @@ export default function OrderManagement() {
                                 <span className="text-sm font-medium">Tunai</span>
                             </div>
                             <div
-                                onClick={() => setForm({ ...form, payment: "transfer" })}
+                                onClick={() => {
+                                    const randomNumber = Math.floor(100 + Math.random() * 900);
+                                    const resi = `CRG-2026-${randomNumber}`;
+                                    router.push(`/admin/order/transfer?resi=${resi}&total=${totalPrice()}`);
+                                }}
                                 className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer transition w-48
                                 ${form.payment === "transfer" ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
                             >
@@ -242,16 +302,26 @@ export default function OrderManagement() {
 
             {showSuccess && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-2xl text-center max-w-sm">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            ✔
+                    <div className="bg-gray-100 p-10 rounded-3xl text-center w-[400px] shadow-xl">
+                        <div className="w-24 h-24 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                ✔
+                            </div>
                         </div>
 
-                        <h2 className="text-xl font-semibold text-green-700">Pesanan Telah Tersimpan!</h2>
-                        <button onClick={() => setShowSuccess(false)} className="mt-6 bg-green-600 text-white px-6 py-2 rounded-full"
-                            >
+                        <h2 className="text-3xl font-bold text-green-800 leading-snug">Pesanan Telah <br /> Tersimpan!</h2>
+                        <p className="mt-4 text-gray-600">Nomor resi Anda adalah{" "}<span className="text-green-700 font-semibold">{resi}</span></p>
+                        <p className="text-gray-500 text-sm mt-1">Pesanan sedang diproses.</p>
+                        <button 
+                            onClick={() => {
+                                setShowSuccess(false);
+                                router.push("/admin/beranda");
+                            }} 
+                            className="mt-8 bg-green-700 hover:bg-green-800 text-white w-full py-4 rounded-full text-lg font-semibold shadow-md transition"
+                        >
                             Tutup
                         </button>
+
                     </div>
                 </div>
             )}
