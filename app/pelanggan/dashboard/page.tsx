@@ -1,10 +1,11 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
     const [open, setOpen] = useState(false);
-    
     const menuClicked = () => setOpen(false);
+    const router = useRouter();
     
     const features = [
         {
@@ -57,17 +58,35 @@ export default function Dashboard() {
 
                     {/* Menu */}
                     <div className="space-y-2 flex-1">
-                        <button onClick={menuClicked} className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">Beranda</button>
-                        
-                        {["Beranda", "Riwayat", "Profil"].map((item) => (
-                            <button 
-                                key={item}
-                                onClick={menuClicked}
-                                className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-                            >
-                                {item}
-                            </button>
-                        ))}
+                        <button 
+                            onClick={() => {
+                                router.push("/pelanggan/dashboard");
+                                setOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
+                        >
+                            Beranda
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                router.push("/pelanggan/history");
+                                setOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
+                        >
+                            Riwayat
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                router.push("/pelanggan/profile");
+                                setOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
+                        >
+                            Profil
+                        </button>
                     </div>
 
                     {/* Logout */}
@@ -79,7 +98,7 @@ export default function Dashboard() {
             <div className={`transition-all duration-300 ${open ? 'blur-sm' : ''}`}>
                 <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
                     <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                        <img src="/humbergerMenu.png" alt="menu" className="w-8 h- object-contain" />
+                        <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
                     </button>
 
                     <div className="flex items-center gap-2">

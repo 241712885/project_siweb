@@ -1,4 +1,8 @@
+"use client";
+import { useRouter } from "next/navigation";
+
 export default function Page() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gray-100 font-sans px-10 py-10">
       
@@ -31,7 +35,10 @@ export default function Page() {
           </p>
 
           <div className="flex gap-4 mt-6">
-            <button className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700">
+            <button 
+              onClick={() => router.push("/pelanggan/dashboard")}
+              className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition"
+            >
               Sign In
             </button>
           </div>
