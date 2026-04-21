@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import TransferClient from "./transfer-client";
+import TransferClient from "./transfer-payment";
 
 export default function Page() {
   return (

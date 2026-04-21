@@ -34,7 +34,7 @@ export default function OrderManagement() {
         if (!form.senderAddress) {
             error.senderAddress = "Alamat pengirim wajib diisi";
         } else if (form.senderAddress.split(",").length < 3) {
-            error.senderAddress = "Alamat harus lengkap (minimal: jalan, kota, provinsi)";
+            error.senderAddress = "Isi alamat dengan format: Nama Jalan, Kota, Provinsi (contoh: Jl. Sudirman No.5, Jakarta, DKI Jakarta";
         }
 
         if (!form.receiverName) error.receiverName = "Nama penerima wajib diisi";
@@ -43,7 +43,7 @@ export default function OrderManagement() {
         if (!form.receiverAddress) {
             error.receiverAddress = "Alamat penerima wajib diisi";
         } else if (form.receiverAddress.split(",").length < 3) {
-            error.receiverAddress = "Alamat harus lengkap (minimal: jalan, kota, provinsi)";
+            error.receiverAddress = "Isi alamat dengan format: Nama Jalan, Kota, Provinsi (contoh: Jl. Sudirman No.5, Jakarta, DKI Jakarta";
         }
 
         if (!form.weight || Number(form.weight) < 1) error.weight = "Minimal 1 kg";
@@ -149,7 +149,11 @@ export default function OrderManagement() {
                     </div>
 
                     {/* Logout */}
-                    <button className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
+                    <button 
+                        onClick={() => {
+                            router.push("/keluar");
+                        }}
+                        className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
                 </div>
             </div>
 

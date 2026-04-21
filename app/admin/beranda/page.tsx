@@ -82,7 +82,11 @@ export default function AdminDashboard() {
             </div>
 
             {/* Logout */}
-            <button className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
+            <button 
+                onClick={() => {
+                    router.push("/keluar");
+                }}
+                className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
         </div>
       </div>
 
