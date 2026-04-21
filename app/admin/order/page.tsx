@@ -60,7 +60,12 @@ export default function OrderManagement() {
             const randomNumber = Math.floor(199 + Math.random() * 900);
             const generatedResi = `CRG-2026${randomNumber}`;
             setResi(generatedResi);
-            setShowSuccess(true);
+
+            if (form.payment === "tunai") {
+                setShowSuccess(true);
+            } else if (form.payment === "transfer") {
+                router.push(`/admin/order/transfer?resi=${generatedResi}&total=${totalPrice()}`);
+            }
         }
     };
 
@@ -279,11 +284,7 @@ export default function OrderManagement() {
                                 <span className="text-sm font-medium">Tunai</span>
                             </div>
                             <div
-                                onClick={() => {
-                                    const randomNumber = Math.floor(100 + Math.random() * 900);
-                                    const resi = `CRG-2026-${randomNumber}`;
-                                    router.push(`/admin/order/transfer?resi=${resi}&total=${totalPrice()}`);
-                                }}
+                                onClick={() => setForm({ ...form, payment: "transfer" })}
                                 className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer transition w-48
                                 ${form.payment === "transfer" ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
                             >
