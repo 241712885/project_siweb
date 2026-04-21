@@ -238,8 +238,7 @@ export default function ProfilePage() {
               </button>
               <button 
                 onClick={() => router.push("/keluar")}
-                className="bg-gray-300 text-black py-3 rounded-lg hover:bg-gray-400"
-              >
+                className="border border-red-500 text-red-500 py-3 rounded-lg">
                 Keluar
               </button>
             </div>
