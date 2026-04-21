@@ -45,7 +45,7 @@ const shipments: ShipmentItem[] = [
     sender: "Miranda",
     receiver: "Adele",
     date: "2026-02-20",
-    status: "Menunggu",
+    status: "Menunggu pick up",
     category: "Proses",
   },
   {
