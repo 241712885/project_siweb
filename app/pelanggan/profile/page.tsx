@@ -236,7 +236,10 @@ export default function ProfilePage() {
               >
                 Masuk Halaman Admin
               </button>
-              <button className="border border-red-500 text-red-500 py-3 rounded-lg">
+              <button 
+                onClick={() => router.push("/keluar")}
+                className="bg-gray-300 text-black py-3 rounded-lg hover:bg-gray-400"
+              >
                 Keluar
               </button>
             </div>
