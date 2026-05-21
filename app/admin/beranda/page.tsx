@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Order } from "../../lib/definitions";
+import { Suspense } from "react";
+import Loading from "./loading";
 
 export default function AdminDashboard() {
   const [open, setOpen] = useState(false);
