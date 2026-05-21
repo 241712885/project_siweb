@@ -86,3 +86,28 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type Order = {
+  receipt: string;
+  sender: string;
+  receiver: string;
+  status?: string;
+  type?: string;
+  total?: number;
+};
+
+export type ShipmentStatus =
+  | "Menunggu Pick Up"
+  | "Di Gudang"
+  | "Dalam Pengiriman"
+  | "Terkirim"
+  | "Dibatalkan";
+
+export type AdminShipmentItem = {
+  id: string;
+  date: string;
+  receipt: string;
+  sender: string;
+  receiver: string;
+  status: ShipmentStatus;
+};

@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Order } from "../../lib/definitions";
 
 export default function AdminDashboard() {
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("Beranda");
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Order[]>([]);
   const router = useRouter();
 
   const [startDate, setStartDate] = useState("2026-05-01");
@@ -13,14 +13,24 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetch("/api/pemesanan")
-      .then((res) => res.json())
-      .then((res) => setData(res));
+      .then((res) => {
+        if (!res.ok) throw new Error("Gagal memuat data pemesanan");
+        return res.json();
+      })
+      .then((res) => setData(res))
+      .catch(console.error);
   }, []);
 
-  const total = data.length;
-  const gudang = data.filter(d => d.status === "Gudang").length;
-  const proses = data.filter(d => d.status === "Proses").length;
-  const terkirim = data.filter(d => d.status === "Terkirim").length;
+  const safeData = Array.isArray(data) ? data : [];
+
+  const total = safeData.length;
+  const gudang = safeData.filter(
+    (d) => d.status === "Gudang" || d.status === "Di Gudang"
+  ).length;
+  const proses = safeData.filter(
+    (d) => d.status === "Proses" || d.status === "Dalam Pengiriman"
+  ).length;
+  const terkirim = safeData.filter((d) => d.status === "Terkirim").length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
@@ -98,7 +108,7 @@ export default function AdminDashboard() {
             </button>
 
             <div className="flex items-center gap-2">
-                <img src="/LogoPaketinAja.jpeg" className="w-8 h-8 rounded-full object-contain" />
+                <img src="/LogoPaketinAja.jpeg" alt="Logo PaketinAja" className="w-8 h-8 rounded-full object-contain" />
                 <span className="text-gray-700 font-semibold">PaketinAja</span>
             </div>
             <div />
@@ -173,10 +183,10 @@ export default function AdminDashboard() {
 
                 <tbody>
                   {data.map((item, i) => (
-                    <tr key={i} className="border-b">
-                      <td className="py-2">{item.resi}</td>
-                      <td>{item.pengirim}</td>
-                      <td>{item.penerima}</td>
+                    <tr key={item.receipt ?? i} className="border-b">
+                      <td className="py-2">{item.receipt}</td>
+                      <td>{item.sender}</td>
+                      <td>{item.receiver}</td>
                       <td>
                         <StatusBadge status={item.status} />
                       </td>

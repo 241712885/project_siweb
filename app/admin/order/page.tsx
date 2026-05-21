@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import Loading from "./loading";
 import { useRouter } from "next/navigation";
 
 export default function OrderManagement() {
@@ -55,18 +56,51 @@ export default function OrderManagement() {
         return Object.keys(error).length === 0;
     };
 
-    const handleSubmit = () => {
-        if (validate()) {
-            const randomNumber = Math.floor(199 + Math.random() * 900);
-            const generatedResi = `CRG-2026${randomNumber}`;
-            setResi(generatedResi);
+    const handleSubmit = async () => {
+        if (!validate()) return;
 
-            if (form.payment === "tunai") {
-                setShowSuccess(true);
-            } else if (form.payment === "transfer") {
-                router.push(`/admin/order/transfer?resi=${generatedResi}&total=${totalPrice()}`);
-            }
+        const randomNumber = Math.floor(100 + Math.random() * 900);
+        const generatedResi = `CRG-2026-${randomNumber}`;
+        setResi(generatedResi);
+
+        try {
+            await fetch("/api/pemesanan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    senderName: form.senderName,
+                    receiverName: form.receiverName,
+                    type: form.type,
+                    total: totalPrice(),
+                }),
+            });
+        } catch (error) {
+            console.error(error);
         }
+
+        if (form.payment === "tunai") {
+            setShowSuccess(true);
+        } else {
+            router.push(
+                `/admin/order/transfer?resi=${generatedResi}&total=${totalPrice()}`
+            );
+        }
+
+        setForm({
+            senderName: "",
+            senderPhone: "",
+            senderAddress: "",
+            receiverName: "",
+            receiverPhone: "",
+            receiverAddress: "",
+            weight: "",
+            email: "",
+            payment: "",
+            notes: "",
+            type: "Paket Kecil",
+        });
     };
 
     const getPricePerKg = () => {
@@ -91,8 +125,6 @@ export default function OrderManagement() {
     const formatRupiah = (number: number) => {
         return "Rp " + number.toLocaleString("id-ID");
     };
-
-    const [active, setActive] = useState("Pemesanan");
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
@@ -170,7 +202,7 @@ export default function OrderManagement() {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        <img src="/LogoPaketinAja.jpeg" className="w-8 h-8 rounded-full object-contain" />
+                        <img src="/LogoPaketinAja.jpeg" alt="Logo PaketinAja" className="w-8 h-8 rounded-full object-contain" />
                         <span className="text-gray-700 font-semibold">PaketinAja</span>
                     </div>
                     <div />
@@ -178,32 +210,33 @@ export default function OrderManagement() {
             
                 {/* Content */}
                 <div className="px-10 py-10">
+                <Suspense fallback={<Loading/>}>
                     <h1 className="text-2xl font-bold mb-6">Input Pesanan Baru</h1>
 
                     <div className="grid md:grid-cols-2 gap-8">
                         <div className="bg-white p-6 rounded-2xl shadow space-y-2">
                             <h2 className="font-semibold mb-4 text-green-700">Data Pengirim</h2>
 
-                            <input name="senderName" placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input name="senderName" value={form.senderName} placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.senderName}</p>
 
-                            <input name="senderPhone" placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input name="senderPhone" value={form.senderPhone} placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.senderPhone}</p>
 
-                            <textarea name="senderAddress" placeholder="Alamat Lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
+                            <textarea name="senderAddress" value={form.senderAddress} placeholder="Alamat Lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.senderAddress}</p>
                         </div>
 
                         <div className="bg-white p-6 rounded-2xl shadow space-y-2">
                             <h2 className="font-semibold mb-4 text-green-700">Data Penerima</h2>
 
-                            <input name="receiverName" placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input name="receiverName" value={form.receiverName} placeholder="Nama" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.receiverName}</p>
 
-                            <input name="receiverPhone" placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
+                            <input name="receiverPhone" value={form.receiverPhone} placeholder="Nomor Telepon" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.receiverPhone}</p>
 
-                            <textarea name="receiverAddress" placeholder="Alamat lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
+                            <textarea name="receiverAddress" value={form.receiverAddress} placeholder="Alamat lengkap" onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-gray-300 h-24 resize-none focus:ring-2 focus:ring-green-500" />
                             <p className="text-red-500 text-sm">{errors.receiverAddress}</p>
                         </div>
                     </div>
@@ -216,7 +249,7 @@ export default function OrderManagement() {
                             <div className="flex flex-col gap-4">
                                 <div>
                                     <label className="text-sm text-gray-600">Tipe Paket</label>
-                                    <select name="type" onChange={handleChange} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500">
+                                    <select name="type" value={form.type} onChange={handleChange} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500">
                                         <option>Paket Kecil</option>
                                         <option>Paket Sedang</option>
                                         <option>Paket Besar</option>
@@ -228,6 +261,8 @@ export default function OrderManagement() {
                                     <input 
                                         name="weight"
                                         type="number"
+                                        value={form.weight}
+                                        min={1}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500"
                                     />
@@ -242,6 +277,7 @@ export default function OrderManagement() {
                                         name="email"
                                         type="email"
                                         onChange={handleChange}
+                                        value={form.email}
                                         className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500"
                                     />
                                 </div>
@@ -261,8 +297,8 @@ export default function OrderManagement() {
                                 <label className="text-sm text-gray-600 mb-1">Catatan</label>
                                 <textarea
                                     name="notes"
+                                    value={form.notes}
                                     onChange={handleChange}
-                                    className="w-full flex-1 px-3 py-2 rounded-lg border border-gray-300 resize-none focus:ring-2 focus:ring-green-500"
                                 />
                             </div>
                         </div>
@@ -299,9 +335,13 @@ export default function OrderManagement() {
                         <p className="text-red-500 text-sm mt-2">{errors.payment}</p>
                     </div>
 
-                    <button onClick={handleSubmit} className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold mt-6 hover:bg-green-700 transition">
+                    <button 
+                        onClick={handleSubmit} 
+                        className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold mt-6 hover:bg-green-700 transition"
+                    >
                         + Simpan Pesanan
                     </button>
+                </Suspense>
                 </div>
             </div>
 
@@ -320,14 +360,13 @@ export default function OrderManagement() {
                         <button 
                             onClick={() => {
                                 setShowSuccess(false);
-                                router.push("/admin/beranda");
+                                router.push("/admin/order");
                             }} 
                             className="mt-8 bg-green-700 hover:bg-green-800 text-white w-full py-4 rounded-full text-lg font-semibold shadow-md transition"
                         >
                             Tutup
                         </button>
-
-                    </div>
+                    </div>  
                 </div>
             )}
         </div>

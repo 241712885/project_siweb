@@ -1,43 +1,64 @@
-let data = [
-  {
-    id: 1,
-    resi: "CRG-2026-001",
-    pengirim: "Miranda",
-    penerima: "Ale",
-    status: "Menunggu",
-  },
-  {
-    id: 2,
-    resi: "CRG-2026-002",
-    pengirim: "Dhinda",
-    penerima: "Jio",
-    status: "Proses",
-  },
-  {
-    id: 3,
-    resi: "CRG-2026-003",
-    pengirim: "Vanesa",
-    penerima: "Jennie",
-    status: "Terkirim",
-  },
-];
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
-  return Response.json(data);
+    try {
+        const orders = await sql`
+            SELECT * FROM orders
+            ORDER BY id DESC
+        `;
+
+        return Response.json(orders);
+
+    } catch(error){
+        return Response.json(
+            {error:"Gagal mengambil data"},
+            {status:500}
+        );
+    }
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+    try{
+        const body = await req.json();
 
-  const newData = {
-    id: Date.now(),
-    resi: "CRG-" + Math.floor(Math.random() * 1000),
-    pengirim: body.senderName || "Unknown",
-    penerima: body.receiverName || "Unknown",
-    status: "Menunggu",
-  };
+        const randomNumber =
+            Math.floor(100 + Math.random() * 900);
 
-  data.push(newData);
+        const generatedResi =
+            `CRG-2026-${randomNumber}`;
 
-  return Response.json(newData);
+        const result = await sql`
+
+        INSERT INTO orders
+        (
+            receipt,
+            sender,
+            receiver,
+            type,
+            total
+        )
+
+        VALUES
+        (
+            ${generatedResi},
+            ${body.senderName},
+            ${body.receiverName},
+            ${body.type},
+            ${body.total}
+        )
+
+        RETURNING *
+        `;
+
+        return Response.json(result[0]);
+
+    }catch(error){
+
+        return Response.json(
+            {error:"Gagal menyimpan data"},
+            {status:500}
+        );
+    }
 }

@@ -1,7 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
+import Loading from "./loading";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminShipments } from "../../data/shipment-admin";
 import {
   Menu,
   X,
@@ -11,80 +14,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-type ShipmentStatus =
-  | "Menunggu Pick Up"
-  | "Di Gudang"
-  | "Dalam Pengiriman"
-  | "Terkirim"
-  | "Dibatalkan";
-
-type AdminShipmentItem = {
-  id: string;
-  date: string;
-  receipt: string;
-  sender: string;
-  receiver: string;
-  status: ShipmentStatus;
-};
-
-const initialShipments: AdminShipmentItem[] = [
-  {
-    id: "1",
-    date: "2026-03-11",
-    receipt: "CRG-2026-004",
-    sender: "Miranda",
-    receiver: "Dhinda",
-    status: "Terkirim",
-  },
-  {
-    id: "2",
-    date: "2026-04-12",
-    receipt: "CRG-2026-005",
-    sender: "Jio",
-    receiver: "Ale",
-    status: "Terkirim",
-  },
-  {
-    id: "3",
-    date: "2026-05-13",
-    receipt: "CRG-2026-006",
-    sender: "Vanesa",
-    receiver: "Jennie",
-    status: "Dalam Pengiriman",
-  },
-  {
-    id: "4",
-    date: "2026-06-14",
-    receipt: "CRG-2026-007",
-    sender: "Zayn",
-    receiver: "Hendra",
-    status: "Menunggu Pick Up",
-  },
-  {
-    id: "5",
-    date: "2026-07-15",
-    receipt: "CRG-2026-008",
-    sender: "Malik",
-    receiver: "Harry",
-    status: "Dibatalkan",
-  },
-  {
-    id: "6",
-    date: "2026-08-16",
-    receipt: "CRG-2026-009",
-    sender: "Khanza",
-    receiver: "Hans",
-    status: "Terkirim",
-  },
-  {
-    id: "7",
-    date: "2026-09-17",
-    receipt: "CRG-2026-010",
-    sender: "Pricila",
-    receiver: "Husein",
-    status: "Terkirim",
-  },
-];
+import { AdminShipmentItem, ShipmentStatus } from "../../lib/definitions";
 
 const statusOptions: Array<ShipmentStatus | "Semua Status"> = [
   "Semua Status",
@@ -142,16 +72,22 @@ export default function AdminPengirimanPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const [shipments, setShipments] =
-    useState<AdminShipmentItem[]>(initialShipments);
+    useState<AdminShipmentItem[]>(adminShipments);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("Semua Status");
-  const [startDate, setStartDate] = useState("2026-03-07");
-  const [endDate, setEndDate] = useState("2026-06-18");
-
-  const handleStatusChange = (id: string, newStatus: ShipmentStatus) => {
+  const [status, setStatus] = useState("Semua Status")
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 5;
+  const handleStatusChange = (
+    id: string,
+    newStatus: ShipmentStatus
+  ) => {
     setShipments((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, status: newStatus } : item
+        item.id === id
+          ? { ...item, status: newStatus }
+          : item
       )
     );
   };
@@ -177,6 +113,19 @@ export default function AdminPengirimanPage() {
       return matchSearch && matchStatus && matchDate;
     });
   }, [shipments, search, status, startDate, endDate]);
+  const totalPages = Math.max(
+  1,
+  Math.ceil(
+    filteredShipments.length /
+    itemsPerPage
+  )
+);
+
+  const paginatedShipments =
+    filteredShipments.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
@@ -254,12 +203,13 @@ export default function AdminPengirimanPage() {
             </button>
 
             <div className="flex items-center gap-2">
-                <img src="/LogoPaketinAja.jpeg" className="w-8 h-8 rounded-full object-contain" />
+                <img src="/LogoPaketinAja.jpeg" alt="Logo PaketinAja" className="w-8 h-8 rounded-full object-contain" />
                 <span className="text-gray-700 font-semibold">PaketinAja</span>
             </div>
             <div />
         </div>
 
+        <Suspense fallback={<Loading/>}>
         <main className="px-4 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-5xl">
             <section>
@@ -277,7 +227,10 @@ export default function AdminPengirimanPage() {
                     <input
                       type="text"
                       value={search}
-                      onChange={(e) => setSearch(e.target.value)}
+                      onChange={(e)=>{
+                      setSearch(e.target.value)
+                      setCurrentPage(1)
+                      }}
                       placeholder="Cari resi, pengiriman, penerima..."
                       className="ml-2 w-full bg-transparent text-sm text-slate-700 outline-none border-none focus:outline-none focus:ring-0 focus:border-none placeholder:text-slate-400"
                     />
@@ -286,7 +239,10 @@ export default function AdminPengirimanPage() {
                   <div className="relative">
                     <select
                       value={status}
-                      onChange={(e) => setStatus(e.target.value)}
+                      onChange={(e)=>{
+                      setStatus(e.target.value)
+                      setCurrentPage(1)
+                      }}
                       className="w-full appearance-none rounded-full border border-[#7BBE9D] bg-white px-4 py-2.5 text-sm text-slate-600 outline-none"
                     >
                       {statusOptions.map((item) => (
@@ -351,15 +307,15 @@ export default function AdminPengirimanPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredShipments.map((item, index) => (
-                      <tr
-                        key={item.id}
-                        className={
-                          index !== filteredShipments.length - 1
-                            ? "border-b border-slate-200"
-                            : ""
-                        }
-                      >
+                      {paginatedShipments.map((item,index)=>(                      
+                        <tr
+                          key={item.id}
+                          className={
+                            index !== paginatedShipments.length - 1
+                              ? "border-b border-slate-200"
+                              : ""
+                          }
+                        >
                         <td className="px-4 py-3 text-slate-500">
                           {formatDate(item.date)}
                         </td>
@@ -415,7 +371,7 @@ export default function AdminPengirimanPage() {
                       </tr>
                     ))}
 
-                    {filteredShipments.length === 0 && (
+                    {paginatedShipments.length === 0 && (
                       <tr>
                         <td
                           colSpan={6}
@@ -429,8 +385,46 @@ export default function AdminPengirimanPage() {
                 </table>
               </div>
             </section>
+            <div className="flex justify-center items-center gap-2 mt-6">
+
+              <button
+                onClick={() =>setCurrentPage((prev:number)=>prev-1)}
+                disabled={currentPage===1}
+                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+              >
+                {"< Previous"}
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() =>
+                      setCurrentPage(pageNumber)
+                    }
+                    className={`w-10 h-10 rounded-lg border transition
+                    ${currentPage === pageNumber ? "bg-green-600 text-white border-green-600" : "bg-white hover:bg-gray-100"}`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev:number)=>prev+1)
+                }
+                disabled={currentPage===totalPages}
+                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+              >
+                {"Next >"}
+              </button>
+            </div>
           </div>
         </main>
+        </Suspense>
       </div>
     </div>
   );
