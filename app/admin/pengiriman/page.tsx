@@ -255,16 +255,13 @@ export default function AdminPengirimanPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[18px] bg-[#DCE8E2] p-4">
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-[44px_1fr_1fr] md:items-center">
-                    <div className="hidden h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm text-slate-600 md:flex md:mt-5">
-                      <CalendarDays className="h-5 w-5" />
-                    </div>
+                <div className="rounded-2xl bg-[#EAF5EF] p-5 shadow-sm">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-600">
+                      <label className="mb-2 block text-sm font-semibold text-green-900">
                         Tanggal Mulai
                       </label>
-                      <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-green-400 transition">
+                      <div className="rounded-xl border border-green-100 bg-white px-4 py-3 transition-all duration-300 hover:border-green-300 focus-within:ring-2 focus-within:ring-green-300">
                         <input
                           type="date"
                           value={startDate}
@@ -275,10 +272,10 @@ export default function AdminPengirimanPage() {
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-600">
+                      <label className="mb-2 block text-sm font-semibold text-green-900">
                         Tanggal Selesai
                       </label>
-                      <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-green-400 transition">
+                      <div className="rounded-xl border border-green-100 bg-white px-4 py-3 transition-all duration-300 hover:border-green-300 focus-within:ring-2 focus-within:ring-green-300">
                         <input
                           type="date"
                           value={endDate}
