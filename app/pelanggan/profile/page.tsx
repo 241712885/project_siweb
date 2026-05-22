@@ -222,7 +222,7 @@ export default function ProfilePage() {
 
               <button
                 onClick={handleSubmit}
-                className="bg-green-600 text-white w-full py-3 rounded-lg mt-3 hover:bg-green-700"
+                className="bg-green-600 text-white w-full py-3 rounded-lg mt-3 hover:bg-green-700 transition-all duration-200"
               >
                 Simpan Perubahan
               </button>
@@ -232,13 +232,13 @@ export default function ProfilePage() {
             <div className="max-w-xl w-full mt-6 flex flex-col gap-3">
               <button 
                 onClick={() => router.push("/admin/beranda")}
-                className="bg-green-300 text-black py-3 rounded-lg hover:bg-green-400"
+                className="border border-green-600 text-green-700 py-3 rounded-lg hover:bg-green-100 hover:text-green-800 transition-all duration-200"
               >
                 Masuk Halaman Admin
               </button>
               <button 
                 onClick={() => router.push("/keluar")}
-                className="border border-red-500 text-red-500 py-3 rounded-lg">
+                className="border border-red-600 text-red-700 py-3 rounded-lg hover:bg-red-100 hover:text-red-800 transition-all duration-200">
                 Keluar
               </button>
             </div>

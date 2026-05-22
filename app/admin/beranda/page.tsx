@@ -167,39 +167,6 @@ export default function AdminDashboard() {
               <Bar label="Terkirim" value={terkirim} />
             </div>
           </div>
-
-          {/* TABLE */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
-            <h3 className="font-semibold mb-4 text-sm sm:text-base">Data Pengiriman</h3>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-[600px] w-full text-sm">
-                <thead className="border-b">
-                  <tr>
-                    <th className="text-left py-2">Resi</th>
-                    <th className="text-left">Pengirim</th>
-                    <th className="text-left">Penerima</th>
-                    <th className="text-left">Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {data.map((item, i) => (
-                    <tr key={item.receipt ?? i} className="border-b">
-                      <td className="py-2">{item.receipt}</td>
-                      <td>{item.sender}</td>
-                      <td>{item.receiver}</td>
-                      <td>
-                        <StatusBadge status={item.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-          </div>
-
         </div>
       </div>
     </div>
