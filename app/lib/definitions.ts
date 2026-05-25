@@ -88,12 +88,13 @@ export type InvoiceForm = {
 };
 
 export type Order = {
-  receipt: string;
-  sender: string;
-  receiver: string;
-  status?: string;
-  type?: string;
-  total?: number;
+  id: number;
+  no_resi: string;
+  nama_pengirim: string;
+  nama_penerima: string;
+  status_pengiriman: string;
+  tanggal_kirim: string;
+  total_harga: number;
 };
 
 export type ShipmentStatus =

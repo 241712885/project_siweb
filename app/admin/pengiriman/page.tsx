@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import Loading from "./loading";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { adminShipments } from "../../data/shipment-admin";
 import {
   Menu,
   X,
@@ -72,25 +71,51 @@ export default function AdminPengirimanPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const [shipments, setShipments] =
-    useState<AdminShipmentItem[]>(adminShipments);
+    useState<AdminShipmentItem[]>([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Semua Status")
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 5;
-  const handleStatusChange = (
+  const handleStatusChange = async (
     id: string,
     newStatus: ShipmentStatus
   ) => {
-    setShipments((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, status: newStatus }
-          : item
-      )
-    );
+    try {
+      await fetch(`/api/shipments/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      setShipments((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? { ...item, status: newStatus }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Gagal update status:", error);
+    }
   };
+
+  useEffect(() => {
+    const fetchShipments = async () => {
+      try {
+        const res = await fetch("/api/shipments");
+        const data = await res.json();
+        setShipments(data);
+      } catch (error) {
+        console.error("Gagal ambil data:", error);
+      }
+    };
+
+    fetchShipments();
+  }, []);
 
   const filteredShipments = useMemo(() => {
     return shipments.filter((item) => {

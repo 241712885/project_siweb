@@ -9,6 +9,7 @@ export default function TransferPage() {
     const total = Number(params.get("total"));
     const [showSuccess, setShowSuccess] = useState(false);
     const [time, setTime] = useState(60);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -34,7 +35,36 @@ export default function TransferPage() {
     const formatRupiah = (number: number) => {
         return "Rp " + number.toLocaleString("id-ID");
     };
-    
+
+    const handleKonfirmasi = async () => {
+        if (!resi) return;
+        setLoading(true);
+
+        try {
+            const getRes = await fetch(`/api/pemesanan?search=${resi}`);
+            const getData = await getRes.json();
+            const pesanan = getData.data?.find((p: any) => p.no_resi === resi);
+
+            if (pesanan) {
+                await fetch("/api/pemesanan", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        id: pesanan.id,
+                        status_transaksi: "sudah bayar",
+                    }),
+                });
+            }
+
+            setShowSuccess(true);
+        } catch (error) {
+            console.error("Gagal konfirmasi pembayaran:", error);
+            alert("Gagal mengkonfirmasi pembayaran. Coba lagi.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#E8FDF5] to-gray-100 px-4">
             <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg text-center">
@@ -53,9 +83,7 @@ export default function TransferPage() {
                     </div>
                     <div className="text-right">
                         <p className="text-gray-500 text-sm">Total Pembayaran</p>
-                        <p className="font-bold text-green-600">
-                            {formatRupiah(total)}
-                        </p>
+                        <p className="font-bold text-green-600">{formatRupiah(total)}</p>
                     </div>
                 </div>
 
@@ -64,32 +92,36 @@ export default function TransferPage() {
                         <p className="text-gray-500 text-sm">Bank Tujuan</p>
                         <p className="font-semibold text-lg">BCA</p>
                     </div>
-
                     <div className="border rounded-xl p-4">
                         <p className="text-gray-500 text-sm">Nomor Rekening</p>
                         <p className="font-semibold">1234567890</p>
                     </div>
-
                     <div className="border rounded-xl p-4">
                         <p className="text-gray-500 text-sm">Nama Penerima</p>
                         <p className="font-semibold">PT PaketinAja Indonesia</p>
                     </div>
-
                     <div className="border rounded-xl p-4">
                         <p className="text-gray-500 text-sm">Jumlah Transfer</p>
-                        <p className="font-semibold text-green-600">
-                            {formatRupiah(total)}
-                        </p>
+                        <p className="font-semibold text-green-600">{formatRupiah(total)}</p>
                     </div>
                 </div>
 
                 <button
-                    disabled={time === 0}
-                    onClick={() => setShowSuccess(true)}
-                    className={`w-full py-4 rounded-full font-semibold shadow-lg text-white transition
-                    ${time === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+                    disabled={time === 0 || loading}
+                    onClick={handleKonfirmasi}
+                    className={`w-full py-4 rounded-full font-semibold shadow-lg text-white transition flex items-center justify-center gap-2
+                    ${time === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}
+                    ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
-                    {time === 0 ? "Waktu Habis" : "Konfirmasi Pembayaran"}
+                    {loading ? (
+                        <>
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                            </svg>
+                            Mengkonfirmasi...
+                        </>
+                    ) : time === 0 ? "Waktu Habis" : "Konfirmasi Pembayaran"}
                 </button>
 
                 {showSuccess && (
@@ -100,15 +132,17 @@ export default function TransferPage() {
                                     ✔
                                 </div>
                             </div>
-
-                            <h2 className="text-3xl font-bold text-green-800 leading-snug">Pembayaran Telah Dikonfirmasi!</h2>
-                            <p className="mt-4 text-gray-600">Nomor resi Anda adalah{" "}<span className="text-green-700 font-semibold">{resi}</span></p>
+                            <h2 className="text-3xl font-bold text-green-800 leading-snug">Pembayaran Telah<br />Dikonfirmasi!</h2>
+                            <p className="mt-4 text-gray-600">
+                                Nomor resi Anda adalah{" "}
+                                <span className="text-green-700 font-semibold">{resi}</span>
+                            </p>
                             <p className="text-gray-500 text-sm mt-1">Pesanan sedang diproses.</p>
-                            <button 
+                            <button
                                 onClick={() => {
                                     setShowSuccess(false);
                                     router.push("/admin/beranda");
-                                }} 
+                                }}
                                 className="mt-8 bg-green-700 hover:bg-green-800 text-white w-full py-4 rounded-full text-lg font-semibold shadow-md transition"
                             >
                                 Tutup

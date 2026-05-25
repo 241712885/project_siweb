@@ -1,210 +1,256 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Order } from "../../lib/definitions";
-import { Suspense } from "react";
-import Loading from "./loading";
+
+type Order = {
+  id: number;
+  no_resi: string;
+  nama_pengirim: string;
+  nama_penerima: string;
+  status_pengiriman: string;
+  status_transaksi: string;
+  total_harga: string;
+  tanggal_kirim: string;
+  tipe_paket: string | null;
+};
 
 export default function AdminDashboard() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const [startDate, setStartDate] = useState("2026-05-01");
-  const [endDate, setEndDate] = useState("2026-05-18");
+  const today    = new Date().toISOString().slice(0, 10);
+  const firstDay = today.slice(0, 7) + "-01";
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate]     = useState(today);
 
   useEffect(() => {
-    fetch("/api/pemesanan")
+    setLoading(true);
+    fetch(`/api/pemesanan?tanggalMulai=${startDate}&tanggalSelesai=${endDate}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Gagal memuat data pemesanan");
+        if (!res.ok) throw new Error("Gagal memuat data");
         return res.json();
       })
-      .then((res) => setData(res))
-      .catch(console.error);
-  }, []);
+      .then((res) => setData(Array.isArray(res.data) ? res.data : []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [startDate, endDate]);
 
   const safeData = Array.isArray(data) ? data : [];
 
-  const total = safeData.length;
-  const gudang = safeData.filter(
-    (d) => d.status === "Gudang" || d.status === "Di Gudang"
+  // Nilai valid DB: 'pending' | 'diproses' | 'dalam pengiriman' | 'selesai'
+  const total    = safeData.length;
+  const gudang   = safeData.filter((d) =>
+    d.status_pengiriman === "pending" || d.status_pengiriman === "diproses"
   ).length;
-  const proses = safeData.filter(
-    (d) => d.status === "Proses" || d.status === "Dalam Pengiriman"
+  const proses   = safeData.filter((d) =>
+    d.status_pengiriman === "dalam pengiriman"
   ).length;
-  const terkirim = safeData.filter((d) => d.status === "Terkirim").length;
+  const terkirim = safeData.filter((d) =>
+    d.status_pengiriman === "selesai"
+  ).length;
+  const maxVal   = Math.max(gudang, proses, terkirim, 1);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
       {open && (
-          <div
-              className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
-              onClick={() => setOpen(false)} 
-          />
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
+          onClick={() => setOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 
-        ${open ? 'translate-x-0' : '-translate-x-full'}`}
-      >  
+      <div className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-6 flex flex-col h-full">
-            <div className="flex items-start gap-3 mb-10">
-                <div className="flex flex-col">
-                    <span className="text-green-700 font-semibold text-lg">
-                        PaketinAja
-                    </span>
-                    <span className="text-gray-700 text-sm">
-                        Kirim mudah, cepat, dan aman
-                    </span>
-                </div>
+          <div className="flex items-start gap-3 mb-10">
+            <div className="flex flex-col">
+              <span className="text-green-700 font-semibold text-lg">PaketinAja</span>
+              <span className="text-gray-700 text-sm">Kirim mudah, cepat, dan aman</span>
             </div>
+          </div>
 
-            {/* Menu */}
-            <div className="space-y-2 flex-1">
-                <button 
-                    onClick={() => {
-                        router.push("/admin/beranda");
-                        setOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
-                >
-                    Beranda
-                </button>
+          <div className="space-y-2 flex-1">
+            <button onClick={() => { router.push("/admin/beranda"); setOpen(false); }}
+              className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">
+              Beranda
+            </button>
+            <button onClick={() => { router.push("/admin/order"); setOpen(false); }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+              Pemesanan
+            </button>
+            <button onClick={() => { router.push("/admin/pengiriman"); setOpen(false); }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+              Pengiriman
+            </button>
+            <button onClick={() => { router.push("/admin/armada"); setOpen(false); }}
+              className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+              Armada
+            </button>
+          </div>
 
-                <button
-                    onClick={() => {
-                        router.push("/admin/order");
-                        setOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-                >
-                    Pemesanan
-                </button>
-
-                <button
-                    onClick={() => {
-                        router.push("/admin/pengiriman");
-                        setOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-                >
-                    Pengiriman
-                </button>
-            </div>
-
-            {/* Logout */}
-            <button 
-                onClick={() => {
-                    router.push("/keluar");
-                }}
-                className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
+          <button onClick={() => router.push("/keluar")}
+            className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">
+            Keluar
+          </button>
         </div>
       </div>
 
       {/* Main */}
-      <div className={`transition-all duration-300 ${open ? 'blur-sm' : ''}`}>
+      <div className={`transition-all duration-300 ${open ? "blur-sm pointer-events-none" : ""}`}>
+        {/* Navbar */}
         <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
-            <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
-            </button>
-
-            <div className="flex items-center gap-2">
-                <img src="/LogoPaketinAja.jpeg" alt="Logo PaketinAja" className="w-8 h-8 rounded-full object-contain" />
-                <span className="text-gray-700 font-semibold">PaketinAja</span>
-            </div>
-            <div />
+          <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
+            <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
+          </button>
+          <div className="flex items-center gap-2">
+            <img src="/LogoPaketinAja.jpeg" alt="Logo" className="w-8 h-8 rounded-full object-contain" />
+            <span className="text-gray-700 font-semibold">PaketinAja</span>
+          </div>
+          <div />
         </div>
 
-        {/* CONTENT */}
+        {/* Content */}
         <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-10">
-
           <h1 className="text-xl sm:text-2xl font-bold">Beranda Admin</h1>
           <p className="text-gray-500 mb-6 text-sm sm:text-base">Ringkasan data pengiriman</p>
 
-          {/* DATE PICKER */}
+          {/* Filter Tanggal */}
           <div className="mb-8">
             <div className="bg-gray-100 p-4 rounded-xl inline-flex flex-col sm:flex-row gap-4 sm:gap-6">
-
               <div>
-                <p className="text-sm text-gray-500">Tanggal Mulai</p>
+                <p className="text-sm text-gray-500 mb-1">Tanggal Mulai</p>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="px-3 py-2 rounded-lg border"
+                  className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-
               <div>
-                <p className="text-sm text-gray-500">Tanggal Selesai</p>
+                <p className="text-sm text-gray-500 mb-1">Tanggal Selesai</p>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="px-3 py-2 rounded-lg border"
+                  className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-
             </div>
           </div>
 
-          {/* CARD */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            <Card title="Total Pesanan" value={total} />
-            <Card title="Di Gudang" value={gudang} />
-            <Card title="Pengiriman" value={proses} />
-            <Card title="Terkirim" value={terkirim} />
-          </div>
-
-          {/* CHART */}
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow mb-10">
-            <h3 className="font-semibold mb-4 text-sm sm:text-base">Status Pengiriman</h3>
-
-            <div className="flex items-end justify-between sm:justify-start sm:gap-10 h-40">
-              <Bar label="Gudang" value={gudang} />
-              <Bar label="Proses" value={proses} />
-              <Bar label="Terkirim" value={terkirim} />
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-3 text-gray-400">
+                <svg className="animate-spin h-8 w-8 text-green-500" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                <span className="text-sm">Memuat data...</span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <Card title="Total Pesanan" value={total}    color="text-gray-800" />
+                <Card title="Di Gudang"     value={gudang}   color="text-yellow-600" />
+                <Card title="Pengiriman"    value={proses}   color="text-blue-600" />
+                <Card title="Selesai"       value={terkirim} color="text-green-600" />
+              </div>
+
+              {/* Chart */}
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow mb-10">
+                <h3 className="font-semibold mb-6 text-sm sm:text-base">Status Pengiriman</h3>
+                <div className="flex items-end gap-6 sm:gap-10 h-40">
+                  <Bar label="Gudang"   value={gudang}   maxVal={maxVal} color="bg-yellow-400" />
+                  <Bar label="Proses"   value={proses}   maxVal={maxVal} color="bg-blue-400" />
+                  <Bar label="Selesai"  value={terkirim} maxVal={maxVal} color="bg-green-500" />
+                </div>
+              </div>
+
+              {/* Tabel 5 Pesanan Terbaru */}
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
+                <h3 className="font-semibold mb-4 text-sm sm:text-base">Pesanan Terbaru</h3>
+                {safeData.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-6">
+                    Tidak ada data pada rentang tanggal ini
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-gray-500 border-b">
+                          <th className="pb-2 pr-4">No Resi</th>
+                          <th className="pb-2 pr-4">Pengirim</th>
+                          <th className="pb-2 pr-4">Penerima</th>
+                          <th className="pb-2 pr-4">Status</th>
+                          <th className="pb-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {safeData.slice(0, 5).map((d) => (
+                          <tr key={d.id} className="border-b last:border-0 hover:bg-gray-50">
+                            <td className="py-2 pr-4 font-mono text-xs">{d.no_resi}</td>
+                            <td className="py-2 pr-4">{d.nama_pengirim}</td>
+                            <td className="py-2 pr-4">{d.nama_penerima}</td>
+                            <td className="py-2 pr-4">
+                              <StatusBadge status={d.status_pengiriman} />
+                            </td>
+                            <td className="py-2 text-green-700 font-semibold">
+                              {"Rp " + Number(d.total_harga).toLocaleString("id-ID")}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function Card({ title, value }: any) {
+function Card({ title, value, color }: { title: string; value: number; color: string }) {
   return (
     <div className="bg-white p-4 rounded-xl shadow border">
       <p className="text-sm text-gray-500">{title}</p>
-      <h2 className="text-lg sm:text-xl font-bold">{value}</h2>
+      <h2 className={`text-xl sm:text-2xl font-bold mt-1 ${color}`}>{value}</h2>
     </div>
   );
 }
 
-function Bar({ label, value }: any) {
+function Bar({ label, value, maxVal, color }: { label: string; value: number; maxVal: number; color: string }) {
+  const height = maxVal > 0 ? Math.max((value / maxVal) * 120, value > 0 ? 8 : 0) : 0;
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-xs font-semibold text-gray-600">{value}</span>
       <div
-        style={{ height: `${value * 30}px` }}
-        className="w-8 sm:w-12 bg-green-500 rounded"
-      ></div>
-      <span className="text-xs mt-2">{label}</span>
+        style={{ height: `${height}px` }}
+        className={`w-10 sm:w-14 ${color} rounded-t transition-all duration-500`}
+      />
+      <span className="text-xs text-gray-500 mt-1">{label}</span>
     </div>
   );
 }
 
-function StatusBadge({ status }: any) {
+function StatusBadge({ status }: { status: string }) {
+  // Nilai valid DB: 'pending' | 'diproses' | 'dalam pengiriman' | 'selesai'
+  const map: Record<string, { bg: string; label: string }> = {
+    "pending":          { bg: "bg-gray-100 text-gray-600",    label: "Menunggu" },
+    "diproses":         { bg: "bg-yellow-100 text-yellow-700", label: "Diproses" },
+    "dalam pengiriman": { bg: "bg-blue-100 text-blue-700",    label: "Dikirim" },
+    "selesai":          { bg: "bg-green-100 text-green-700",   label: "Selesai" },
+  };
+  const style = map[status] ?? { bg: "bg-gray-100 text-gray-500", label: status };
   return (
-    <span className={`px-3 py-1 rounded-full text-xs
-      ${
-        status === "Menunggu"
-          ? "bg-yellow-200 text-yellow-800"
-          : status === "Proses"
-          ? "bg-blue-200 text-blue-800"
-          : "bg-green-200 text-green-800"
-      }`}>
-      {status}
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${style.bg}`}>
+      {style.label}
     </span>
   );
 }
