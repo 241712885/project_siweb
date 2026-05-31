@@ -36,7 +36,7 @@ export default function Page() {
 
           <div className="flex gap-4 mt-6">
             <button 
-              onClick={() => router.push("/pelanggan/dashboard")}
+              onClick={() => router.push("/login-regist/login")}
               className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition"
             >
               Sign In

@@ -69,8 +69,20 @@ export async function DELETE(req: Request) {
 
     if (!id) return Response.json({ error: "ID tidak ditemukan" }, { status: 400 });
 
-    await sql`DELETE FROM driver WHERE id = ${parseInt(id)}`;
+    const driver = await sql`SELECT status_driver FROM driver WHERE id = ${parseInt(id)}`;
+    
+    if (!driver[0]) return Response.json({ error: "Driver tidak ditemukan" }, { status: 404 });
 
+    if (driver[0].status_driver === "bertugas") {
+      return Response.json(
+        { error: "Driver tidak bisa dihapus karena sedang bertugas." },
+        { status: 409 }
+      );
+    }
+
+    await sql`UPDATE pemesanan SET id_driver = NULL WHERE id_driver = ${parseInt(id)}`;
+    await sql`DELETE FROM driver WHERE id = ${parseInt(id)}`;
+    
     return Response.json({ message: "Driver berhasil dihapus" });
   } catch (error) {
     return Response.json({ error: String(error) }, { status: 500 });

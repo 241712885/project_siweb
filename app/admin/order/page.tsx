@@ -318,26 +318,26 @@ export default function OrderManagement() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div
-        className={`transition-all duration-300 ${
-          open ? "blur-sm pointer-events-none" : ""
-        }`}
-      >
+      {/* Main */}
+      <div className={`transition-all duration-300 ${open ? "blur-sm pointer-events-none" : ""}`}>
         {/* Navbar */}
-        <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
+        <div className="relative flex items-center justify-between px-8 py-5 bg-[#F5F7F6] border border-gray-300 overflow-hidden">
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-green-200 via-green-500 to-emerald-300 blur-[1px]" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-green-100 rounded-full opacity-40 blur-2xl" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-emerald-100 rounded-full opacity-40 blur-2xl" />
+          
           <button
             onClick={() => setOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            className="relative z-10 flex items-center justify-center w-11 h-11 rounded-xl transition"
           >
-            <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
+            <img
+              src="/humbergerMenu.png"
+              alt="menu"
+              className="w-8 h-8 object-contain"
+            />
           </button>
           <div className="flex items-center gap-2">
-            <img
-              src="/LogoPaketinAja.jpeg"
-              alt="Logo PaketinAja"
-              className="w-8 h-8 rounded-full object-contain"
-            />
+            <img src="/LogoPaketinAja.jpeg" alt="Logo" className="w-8 h-8 rounded-full object-contain" />
             <span className="text-gray-700 font-semibold">PaketinAja</span>
           </div>
           <div />

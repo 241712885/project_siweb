@@ -154,17 +154,28 @@ export default function Page() {
         </div>
 
       {/* Main */}
-    <div className={`transition-all duration-300 ${sidebarOpen ? 'blur-sm' : ''}`}>
-        <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
-            <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
-            </button>
-
-            <div className="flex items-center gap-2">
-                <img src="/LogoPaketinAja.jpeg" className="w-8 h-8 rounded-full object-contain" />
-                <span className="text-gray-700 font-semibold">PaketinAja</span>
-            </div>
-            <div />
+      <div className={`transition-all duration-300 ${sidebarOpen ? "blur-sm pointer-events-none" : ""}`}>
+        {/* Navbar */}
+        <div className="relative flex items-center justify-between px-8 py-5 bg-[#F5F7F6] border border-gray-300 overflow-hidden">
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-green-200 via-green-500 to-emerald-300 blur-[1px]" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-green-100 rounded-full opacity-40 blur-2xl" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-emerald-100 rounded-full opacity-40 blur-2xl" />
+          
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="relative z-10 flex items-center justify-center w-11 h-11 rounded-xl transition"
+          >
+            <img
+              src="/humbergerMenu.png"
+              alt="menu"
+              className="w-8 h-8 object-contain"
+            />
+          </button>
+          <div className="flex items-center gap-2">
+            <img src="/LogoPaketinAja.jpeg" alt="Logo" className="w-8 h-8 rounded-full object-contain" />
+            <span className="text-gray-700 font-semibold">PaketinAja</span>
+          </div>
+          <div />
         </div>
 
         <main className="px-4 py-8 sm:px-6 lg:px-8">
@@ -197,41 +208,37 @@ export default function Page() {
                 })}
               </div>
 
-              <div className="mt-6 rounded-[22px] bg-[#D8E7E1] px-5 py-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-[56px_1fr_1fr] md:items-end">
-                  <div className="hidden h-12 w-12 items-center justify-center rounded-xl text-slate-700 md:flex">
-                    <CalendarDays className="h-8 w-8" />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-600">
-                      Tanggal Mulai
-                    </label>
-                    <div className="rounded-full bg-[#D9D5D7] px-4 py-2.5">
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full bg-transparent text-sm text-slate-700 outline-none"
-                      />
+              <div className="rounded-2xl bg-[#EAF5EF] p-5 shadow-sm">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-green-900">
+                        Tanggal Mulai
+                      </label>
+                      <div className="rounded-xl border border-green-100 bg-white px-4 py-3 transition-all duration-300 hover:border-green-300 focus-within:ring-2 focus-within:ring-green-300">
+                        <input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="w-full bg-transparent text-sm text-slate-700 outline-none"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="mb-2 block text-sm font-semibold text-slate-600">
-                      Tanggal Selesai
-                    </label>
-                    <div className="rounded-full bg-[#D9D5D7] px-4 py-2.5">
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full bg-transparent text-sm text-slate-700 outline-none"
-                      />
+                    <div>
+                      <label className="mb-2 block text-sm font-semibold text-green-900">
+                        Tanggal Selesai
+                      </label>
+                      <div className="rounded-xl border border-green-100 bg-white px-4 py-3 transition-all duration-300 hover:border-green-300 focus-within:ring-2 focus-within:ring-green-300">
+                        <input
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          className="w-full bg-transparent text-sm text-slate-700 outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
             </section>
 
             <section className="mt-10 space-y-6">

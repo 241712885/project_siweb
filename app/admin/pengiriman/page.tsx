@@ -108,7 +108,7 @@ export default function AdminPengirimanPage() {
       try {
         const res = await fetch("/api/shipments");
         const data = await res.json();
-        setShipments(data);
+        setShipments(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Gagal ambil data:", error);
       }
@@ -209,6 +209,16 @@ export default function AdminPengirimanPage() {
                 >
                     Pengiriman
                 </button>
+
+                <button
+                    onClick={() => {
+                      router.push("/admin/armada");
+                      setSidebarOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
+                  >
+                    Armada
+                </button>
             </div>
 
             {/* Logout */}
@@ -221,17 +231,29 @@ export default function AdminPengirimanPage() {
       </div>
 
       {/* Main */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'blur-sm' : ''}`}>
-        <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
-            <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-                <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
-            </button>
-
-            <div className="flex items-center gap-2">
-                <img src="/LogoPaketinAja.jpeg" alt="Logo PaketinAja" className="w-8 h-8 rounded-full object-contain" />
-                <span className="text-gray-700 font-semibold">PaketinAja</span>
-            </div>
-            <div />
+      
+      <div className={`transition-all duration-300 ${sidebarOpen ? "blur-sm pointer-events-none" : ""}`}>
+        {/* Navbar */}
+        <div className="relative flex items-center justify-between px-8 py-5 bg-[#F5F7F6] border border-gray-300 overflow-hidden">
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-green-200 via-green-500 to-emerald-300 blur-[1px]" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-green-100 rounded-full opacity-40 blur-2xl" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-emerald-100 rounded-full opacity-40 blur-2xl" />
+          
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="relative z-10 flex items-center justify-center w-11 h-11 rounded-xl transition"
+          >
+            <img
+              src="/humbergerMenu.png"
+              alt="menu"
+              className="w-8 h-8 object-contain"
+            />
+          </button>
+          <div className="flex items-center gap-2">
+            <img src="/LogoPaketinAja.jpeg" alt="Logo" className="w-8 h-8 rounded-full object-contain" />
+            <span className="text-gray-700 font-semibold">PaketinAja</span>
+          </div>
+          <div />
         </div>
 
         <Suspense fallback={<Loading/>}>
@@ -261,22 +283,20 @@ export default function AdminPengirimanPage() {
                     />
                   </div>
 
-                  <div className="relative">
+                  <div className="relative flex items-center rounded-full border border-[#7BBE9D] bg-white px-4 py-2.5">
                     <select
                       value={status}
                       onChange={(e)=>{
-                      setStatus(e.target.value)
-                      setCurrentPage(1)
+                        setStatus(e.target.value)
+                        setCurrentPage(1)
                       }}
-                      className="w-full appearance-none rounded-full border border-[#7BBE9D] bg-white px-4 py-2.5 text-sm text-slate-600 outline-none"
+                      className="w-full appearance-none bg-transparent text-sm text-slate-700 outline-none border-none focus:ring-0 pr-8 cursor-pointer"
+                      style={{ WebkitAppearance: "none", MozAppearance: "none" }}
                     >
                       {statusOptions.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
+                        <option key={item} value={item}>{item}</option>
                       ))}
                     </select>
-                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   </div>
                 </div>
 
@@ -359,34 +379,21 @@ export default function AdminPengirimanPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`text-xs ${updateTextClass(
-                                item.status
-                              )}`}
+                          <div className="relative inline-block">
+                            <select
+                              value={item.status}
+                              onChange={(e) =>
+                                handleStatusChange(item.id, e.target.value as ShipmentStatus)
+                              }
+                              className="appearance-none rounded-full border border-slate-300 bg-[#F8F8F8] px-3 py-1 pr-8 text-xs text-slate-600 outline-none"
                             >
-                              {updateText(item.status)}
-                            </span>
-
-                            <div className="relative">
-                              <select
-                                value={item.status}
-                                onChange={(e) =>
-                                  handleStatusChange(
-                                    item.id,
-                                    e.target.value as ShipmentStatus
-                                  )
-                                }
-                                className="appearance-none rounded-full border border-slate-300 bg-[#F8F8F8] px-3 py-1 pr-8 text-xs text-slate-600 outline-none"
-                              >
-                                {editableStatuses.map((statusItem) => (
-                                  <option key={statusItem} value={statusItem}>
-                                    {statusItem}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-                            </div>
+                              {editableStatuses.map((statusItem) => (
+                                <option key={statusItem} value={statusItem}>
+                                  {statusItem}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                           </div>
                         </td>
                       </tr>

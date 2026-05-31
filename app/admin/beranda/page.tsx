@@ -1,6 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Package,
+  Warehouse,
+  Truck,
+  CheckCircle2,
+  BarChart3,
+  ClipboardList,
+  TrendingUp,
+  Calendar,
+} from "lucide-react";
 
 type Order = {
   id: number;
@@ -100,9 +110,20 @@ export default function AdminDashboard() {
       {/* Main */}
       <div className={`transition-all duration-300 ${open ? "blur-sm pointer-events-none" : ""}`}>
         {/* Navbar */}
-        <div className="flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-md">
-          <button onClick={() => setOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 transition">
-            <img src="/humbergerMenu.png" alt="menu" className="w-8 h-8" />
+        <div className="relative flex items-center justify-between px-8 py-5 bg-[#F5F7F6] border border-gray-300 overflow-hidden">
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-green-200 via-green-500 to-emerald-300 blur-[1px]" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-green-100 rounded-full opacity-40 blur-2xl" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-28 h-28 bg-emerald-100 rounded-full opacity-40 blur-2xl" />
+          
+          <button
+            onClick={() => setOpen(true)}
+            className="relative z-10 flex items-center justify-center w-11 h-11 rounded-xl transition"
+          >
+            <img
+              src="/humbergerMenu.png"
+              alt="menu"
+              className="w-8 h-8 object-contain"
+            />
           </button>
           <div className="flex items-center gap-2">
             <img src="/LogoPaketinAja.jpeg" alt="Logo" className="w-8 h-8 rounded-full object-contain" />
@@ -118,9 +139,11 @@ export default function AdminDashboard() {
 
           {/* Filter Tanggal */}
           <div className="mb-8">
-            <div className="bg-gray-100 p-4 rounded-xl inline-flex flex-col sm:flex-row gap-4 sm:gap-6">
+            <div className="bg-gray-200 p-4 rounded-xl inline-flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Tanggal Mulai</p>
+                <p className="text-sm text-gray-700 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" /> Tanggal Mulai
+                </p>
                 <input
                   type="date"
                   value={startDate}
@@ -129,7 +152,9 @@ export default function AdminDashboard() {
                 />
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Tanggal Selesai</p>
+                <p className="text-sm text-gray-700 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" /> Tanggal Selesai
+                </p>
                 <input
                   type="date"
                   value={endDate}
@@ -154,15 +179,19 @@ export default function AdminDashboard() {
             <>
               {/* Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                <Card title="Total Pesanan" value={total}    color="text-gray-800" />
-                <Card title="Di Gudang"     value={gudang}   color="text-yellow-600" />
-                <Card title="Pengiriman"    value={proses}   color="text-blue-600" />
-                <Card title="Selesai"       value={terkirim} color="text-green-600" />
+                <Card title="Total Pesanan" value={total}    color="text-gray-800"   icon={<Package    className="w-5 h-5" />} />
+                <Card title="Di Gudang"     value={gudang}   color="text-yellow-600" icon={<Warehouse  className="w-5 h-5" />} />
+                <Card title="Pengiriman"    value={proses}   color="text-blue-600"   icon={<Truck      className="w-5 h-5" />} />
+                <Card title="Selesai"       value={terkirim} color="text-green-600"  icon={<CheckCircle2 className="w-5 h-5" />} />
               </div>
 
               {/* Chart */}
               <div className="bg-white p-4 sm:p-6 rounded-xl shadow mb-10">
-                <h3 className="font-semibold mb-6 text-sm sm:text-base">Status Pengiriman</h3>
+                <h3 className="font-semibold mb-6 text-sm sm:text-base flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-green-600" />
+                  Status Pengiriman
+                </h3>
+
                 <div className="flex items-end gap-6 sm:gap-10 h-40">
                   <Bar label="Gudang"   value={gudang}   maxVal={maxVal} color="bg-yellow-400" />
                   <Bar label="Proses"   value={proses}   maxVal={maxVal} color="bg-blue-400" />
@@ -172,7 +201,10 @@ export default function AdminDashboard() {
 
               {/* Tabel 5 Pesanan Terbaru */}
               <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
-                <h3 className="font-semibold mb-4 text-sm sm:text-base">Pesanan Terbaru</h3>
+                <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
+                  <ClipboardList className="w-4 h-4 text-green-600" />
+                  Pesanan Terbaru
+                </h3>
                 {safeData.length === 0 ? (
                   <p className="text-gray-400 text-sm text-center py-6">
                     Tidak ada data pada rentang tanggal ini
@@ -216,11 +248,16 @@ export default function AdminDashboard() {
   );
 }
 
-function Card({ title, value, color }: { title: string; value: number; color: string }) {
+function Card({ title, value, color, icon }: { title: string; value: number; color: string; icon: React.ReactNode }) {
   return (
-    <div className="bg-white p-4 rounded-xl shadow border">
-      <p className="text-sm text-gray-500">{title}</p>
-      <h2 className={`text-xl sm:text-2xl font-bold mt-1 ${color}`}>{value}</h2>
+    <div className="bg-white p-4 rounded-xl shadow border flex items-center gap-4">
+      <div className={`p-3 rounded-xl bg-gray-50 ${color}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <h2 className={`text-xl sm:text-2xl font-bold mt-0.5 ${color}`}>{value}</h2>
+      </div>
     </div>
   );
 }
