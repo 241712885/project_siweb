@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-
-const sql = neon(process.env.DATABASE_URL!);
+import { NextRequest, NextResponse } from "next/server";
+import { sql } from "./../../lib/db";
 
 // DB → UI
 function mapStatus(dbStatus: string) {
