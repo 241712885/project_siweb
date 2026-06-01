@@ -1,6 +1,7 @@
 // app/api/tracking/route.ts
 import { sql } from "../../lib/db";
 import { NextResponse } from "next/server";
+export const runtime = "nodejs";
 
 export async function GET(req: Request): Promise<NextResponse> {
   const { searchParams } = new URL(req.url);

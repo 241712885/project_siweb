@@ -38,11 +38,12 @@ export default function OrderManagement() {
     receiverAddress: "",
     weight: "",
     email: "",
-    payment: "",
+    metode_pembayaran: "",
     notes: "",
     type: "Paket Kecil",
     idDriver: "",
     idKendaraan: "",
+    namaBarang: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -123,9 +124,11 @@ export default function OrderManagement() {
       error.weight = "Berat minimal 1 kg";
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       error.email = "Format email salah";
-    if (!form.payment) error.payment = "Pilih metode pembayaran";
+    if (!form.metode_pembayaran) error.metode_pembayaran = "Pilih metode pembayaran";
     if (!form.idDriver) error.idDriver = "Pilih driver";
     if (!form.idKendaraan) error.idKendaraan = "Pilih kendaraan";
+
+    if (!form.namaBarang.trim()) error.namaBarang = "Nama barang wajib diisi";
 
     setErrors(error);
     return Object.keys(error).length === 0;
@@ -171,11 +174,12 @@ export default function OrderManagement() {
           type: form.type,
           weight: form.weight,
           total: totalPrice(),
-          payment: form.payment,
+          metode_pembayaran: form.metode_pembayaran,
           notes: form.notes,
           email: form.email,
           idDriver: form.idDriver,
           idKendaraan: form.idKendaraan,
+          namaBarang: form.namaBarang,
         }),
       });
 
@@ -197,11 +201,12 @@ export default function OrderManagement() {
         receiverAddress: "",
         weight: "",
         email: "",
-        payment: "",
+        metode_pembayaran: "",
         notes: "",
         type: "Paket Kecil",
         idDriver: "",
         idKendaraan: "",
+        namaBarang: "",
       });
 
       // Re-fetch dropdown supaya driver/kendaraan yang baru dipakai tidak muncul lagi
@@ -222,7 +227,7 @@ export default function OrderManagement() {
         )
       );
 
-      if (form.payment === "tunai") {
+      if (form.metode_pembayaran === "tunai") {
         setShowSuccess(true);
       } else {
         router.push(
@@ -461,6 +466,22 @@ export default function OrderManagement() {
 
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block">
+                    Nama Barang
+                  </label>
+                  <input
+                    name="namaBarang"
+                    value={form.namaBarang}
+                    placeholder="contoh: Sepatu, Elektronik, Makanan"
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  {errors.namaBarang && (
+                    <p className="text-red-500 text-sm mt-1">{errors.namaBarang}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600 mb-1 block">
                     Berat (kg)
                   </label>
                   <input
@@ -648,22 +669,22 @@ export default function OrderManagement() {
               {["tunai", "transfer"].map((method) => (
                 <div
                   key={method}
-                  onClick={() => setForm({ ...form, payment: method })}
+                  onClick={() => setForm({ ...form, metode_pembayaran: method })}
                   className={`flex items-center gap-3 border rounded-xl px-4 py-3 cursor-pointer transition w-48
                     ${
-                      form.payment === method
+                      form.metode_pembayaran === method
                         ? "border-green-500 bg-green-50"
                         : "border-gray-300 hover:border-gray-400"
                     }`}
                 >
                   <div
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      form.payment === method
+                      form.metode_pembayaran === method
                         ? "border-green-500"
                         : "border-gray-300"
                     }`}
                   >
-                    {form.payment === method && (
+                    {form.metode_pembayaran === method && (
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
                     )}
                   </div>
@@ -673,8 +694,8 @@ export default function OrderManagement() {
                 </div>
               ))}
             </div>
-            {errors.payment && (
-              <p className="text-red-500 text-sm mt-2">{errors.payment}</p>
+            {errors.metode_pembayaran && (
+              <p className="text-red-500 text-sm mt-2">{errors.metode_pembayaran}</p>
             )}
           </div>
 

@@ -2,12 +2,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 type Kendaraan = {
   id: number;
   nama_kendaraan: string;
   jenis_kendaraan: string;
   plat_nomor: string;
-  kapasitas_muatan: string;
+  kapasitas_muatan: number;
+  status_kendaraan: "tersedia" | "digunakan" | "maintenance";
+};
+
+type KendaraanForm = {
+  nama_kendaraan: string;
+  jenis_kendaraan: string;
+  plat_nomor: string;
+  kapasitas_muatan: number;
   status_kendaraan: "tersedia" | "digunakan" | "maintenance";
 };
 
@@ -23,10 +32,14 @@ const STATUS_KENDARAAN = ["tersedia", "digunakan", "maintenance"];
 const STATUS_DRIVER     = ["tersedia", "bertugas", "cuti"];
 const JENIS_KENDARAAN   = ["Truk", "Pickup", "Box", "Motor"];
 
-const emptyKendaraan = {
-  nama_kendaraan: "", jenis_kendaraan: "Truk",
-  plat_nomor: "", kapasitas_muatan: "", status_kendaraan: "tersedia",
+const emptyKendaraan: KendaraanForm = {
+  nama_kendaraan: "",
+  jenis_kendaraan: "Truk", 
+  plat_nomor: "",
+  kapasitas_muatan: 0,
+  status_kendaraan: "tersedia",
 };
+
 const emptyDriver = {
   nama_driver: "", no_telepon: "", no_sim: "", status_driver: "tersedia",
 };
@@ -47,7 +60,7 @@ export default function ArmadaPage() {
 
   const [modalK, setModalK]               = useState(false);
   const [editKendaraan, setEditKendaraan] = useState<Kendaraan | null>(null);
-  const [formK, setFormK]                 = useState<any>(emptyKendaraan);
+  const [formK, setFormK] = useState<KendaraanForm>(emptyKendaraan);
   const [errK, setErrK]                   = useState<any>({});
 
   const [modalD, setModalD]       = useState(false);
@@ -61,27 +74,34 @@ export default function ArmadaPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchAll = async () => {
-    setLoading(true);
-    try {
-      const [resK, resD] = await Promise.all([
-        fetch("/api/kendaraan"),
-        fetch("/api/driver"),
-      ]);
-      const dataK = await resK.json();
-      const dataD = await resD.json();
-      setKendaraan(Array.isArray(dataK.data) ? dataK.data : []);
-      setDrivers(Array.isArray(dataD.data) ? dataD.data : []);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setFetchError(null);
+
+  try {
+    const [resK, resD] = await Promise.all([
+      fetch("/api/kendaraan"),
+      fetch("/api/driver"),
+    ]);
+
+    if (!resK.ok || !resD.ok) throw new Error("Gagal ambil data API");
+
+    const dataK = await resK.json();
+    const dataD = await resD.json();
+
+    setKendaraan(Array.isArray(dataK.data) ? dataK.data : []);
+    setDrivers(Array.isArray(dataD.data) ? dataD.data : []);
+  } catch (e: any) {
+    setFetchError(e.message || "Terjadi kesalahan");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => { fetchAll(); }, []);
 
   const filteredK = kendaraan.filter((k) =>
-    String(k.id).includes(searchK.trim())
+    k.nama_kendaraan.toLowerCase().includes(searchK.toLowerCase()) ||
+    String(k.id).includes(searchK)
   );
   
   const filteredD = drivers.filter((d) =>
@@ -103,7 +123,7 @@ export default function ArmadaPage() {
     } else {
       const duplikat = kendaraan.find(
         (k) =>
-          k.plat_nomor.toUpperCase() === plat &&
+          k.plat_nomor?.toUpperCase() === plat && 
           (!editKendaraan || k.id !== editKendaraan.id)
       );
       if (duplikat) e.plat_nomor = "Plat nomor sudah terdaftar";
@@ -142,10 +162,10 @@ export default function ArmadaPage() {
       e.no_sim = "Wajib diisi";
     } else {
       const dupSim = drivers.find(
-        (d) =>
-          d.no_sim.toLowerCase() === formD.no_sim.trim().toLowerCase() &&
-          (!editDriver || d.id !== editDriver.id)
-      );
+      (d) =>
+        d.no_sim?.toLowerCase() === formD.no_sim.trim().toLowerCase() &&  // tambah ?.
+        (!editDriver || d.id !== editDriver.id)
+    );
       if (dupSim) e.no_sim = "No. SIM sudah terdaftar";
     }
 
@@ -154,31 +174,48 @@ export default function ArmadaPage() {
   };
 
   const submitKendaraan = async () => {
-    if (!validateK()) return;
-    const method = editKendaraan ? "PATCH" : "POST";
-    const body   = editKendaraan
-      ? { ...formK, id: editKendaraan.id, plat_nomor: formK.plat_nomor.toUpperCase() }
-      : { ...formK, plat_nomor: formK.plat_nomor.toUpperCase() };
+  if (!validateK()) return;
 
-    try {
-      const res  = await fetch("/api/kendaraan", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) { alert(data.error || "Gagal menyimpan data kendaraan"); return; }
-
-      setToast(editKendaraan ? "Kendaraan berhasil diperbarui" : "Kendaraan berhasil ditambahkan");
-      setModalK(false);
-      setEditKendaraan(null);
-      setFormK(emptyKendaraan);
-      fetchAll();
-    } catch (e) {
-      console.error(e);
-      alert("Terjadi kesalahan jaringan");
-    }
+  const payload = {
+    ...formK,
+    plat_nomor: formK.plat_nomor.toUpperCase(),
+    kapasitas_muatan: Number(formK.kapasitas_muatan), // FIX WAJIB
   };
+
+  const method = editKendaraan ? "PATCH" : "POST";
+
+  if (editKendaraan) {
+    (payload as any).id = editKendaraan.id;
+  }
+
+  try {
+    const res = await fetch("/api/kendaraan", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Gagal menyimpan data kendaraan");
+      return;
+    }
+
+    setToast(
+      editKendaraan
+        ? "Kendaraan berhasil diperbarui"
+        : "Kendaraan berhasil ditambahkan"
+    );
+
+    setModalK(false);
+    setEditKendaraan(null);
+    setFormK(emptyKendaraan);
+    fetchAll();
+  } catch (e) {
+    console.error(e);
+    alert("Terjadi kesalahan jaringan");
+  }
+};
 
   const submitDriver = async () => {
     if (!validateD()) return;
@@ -388,7 +425,9 @@ export default function ArmadaPage() {
                             <td className="py-3 pr-4 font-medium">{k.nama_kendaraan}</td>
                             <td className="py-3 pr-4 text-gray-500">{k.jenis_kendaraan}</td>
                             <td className="py-3 pr-4 font-mono text-xs bg-gray-50 rounded px-2">{k.plat_nomor}</td>
-                            <td className="py-3 pr-4">{Number(k.kapasitas_muatan).toLocaleString("id-ID")} kg</td>
+                            <td className="py-3 pr-4">
+                              {Number(k.kapasitas_muatan || 0).toLocaleString("id-ID")} kg
+                            </td>
                             <td className="py-3 pr-4"><StatusBadgeK status={k.status_kendaraan} /></td>
                             <td className="py-3">
                               <div className="flex gap-2">
@@ -483,14 +522,22 @@ export default function ArmadaPage() {
             <div className="space-y-3">
               <Field label="Nama Kendaraan">
                 <input
+                  type="text"
                   value={formK.nama_kendaraan}
                   onChange={(e) => {
-                    const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
-                    setFormK({ ...formK, nama_kendaraan: val });
-                    if (errK.nama_kendaraan) setErrK({ ...errK, nama_kendaraan: undefined });
+                    const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, "");
+
+                    setFormK({
+                      ...formK,
+                      nama_kendaraan: val,
+                    });
+
+                    if (errK.nama_kendaraan) {
+                      setErrK({ ...errK, nama_kendaraan: undefined });
+                    }
                   }}
                   className={inputCls(!!errK.nama_kendaraan)}
-                  placeholder="contoh: Truk Besar 01"
+                  placeholder="Contoh: Truk Box Besar"
                 />
                 {errK.nama_kendaraan && <Err msg={errK.nama_kendaraan} />}
               </Field>
@@ -506,7 +553,7 @@ export default function ArmadaPage() {
 
               <Field label="Plat Nomor">
                 <input
-                  value={formK.plat_nomor}
+                  value={formK.plat_nomor ?? ""}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, "").toUpperCase();
                     setFormK({ ...formK, plat_nomor: val });
@@ -521,10 +568,10 @@ export default function ArmadaPage() {
               <Field label="Kapasitas Muatan (kg)">
                 <input
                   type="number"
-                  value={formK.kapasitas_muatan}
+                  value={formK.kapasitas_muatan ?? ""}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^0-9]/g, "");
-                    setFormK({ ...formK, kapasitas_muatan: val });
+                    setFormK({ ...formK, kapasitas_muatan: val === "" ? 0 : Number(val) });
                     if (errK.kapasitas_muatan) setErrK({ ...errK, kapasitas_muatan: undefined });
                   }}
                   className={inputCls(!!errK.kapasitas_muatan)}
@@ -535,7 +582,7 @@ export default function ArmadaPage() {
 
               <Field label="Status">
                 <select value={formK.status_kendaraan}
-                  onChange={(e) => setFormK({ ...formK, status_kendaraan: e.target.value })}
+                  onChange={(e) => setFormK({ ...formK, status_kendaraan: e.target.value as KendaraanForm["status_kendaraan"] })}
                   className={inputCls(!!errK.status_kendaraan)}>
                   {STATUS_KENDARAAN.map((s) => <option key={s}>{s}</option>)}
                 </select>
@@ -565,7 +612,7 @@ export default function ArmadaPage() {
             </h2>
             <div className="space-y-3">
               <Field label="Nama Driver">
-                <input value={formD.nama_driver}
+                <input value={formD.nama_driver ?? ""}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
                     setFormD({ ...formD, nama_driver: val });
@@ -578,7 +625,7 @@ export default function ArmadaPage() {
 
               <Field label="No. Telepon">
                 <input
-                  value={formD.no_telepon}
+                  value={formD.no_telepon ?? ""}
                   onChange={(e) => setFormD({ ...formD, no_telepon: e.target.value.replace(/\D/g, "") })}
                   className={inputCls(!!errD.no_telepon)}
                   placeholder="contoh: 081234567890"
@@ -589,7 +636,7 @@ export default function ArmadaPage() {
               </Field>
 
               <Field label="No. SIM">
-                <input value={formD.no_sim}
+                <input value={formD.no_sim ?? ""}
                 onChange={(e) => {
                   const val = e.target.value.replace(/[^a-zA-Z0-9\-]/g, "");
                   setFormD({ ...formD, no_sim: val });
@@ -699,10 +746,11 @@ function Err({ msg }: { msg: string }) {
 
 function StatusBadgeK({ status }: { status: string }) {
   const map: Record<string, string> = {
-    tersedia:    "bg-green-100 text-green-700",
-    digunakan:   "bg-blue-100 text-blue-700",
+    tersedia: "bg-green-100 text-green-700",
+    digunakan: "bg-blue-100 text-blue-700",
     maintenance: "bg-red-100 text-red-600",
   };
+
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${map[status] ?? "bg-gray-100 text-gray-500"}`}>
       {status}

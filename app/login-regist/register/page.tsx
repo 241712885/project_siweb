@@ -97,7 +97,7 @@ export default function RegisterPage() {
       }
 
       // Registrasi berhasil, redirect ke login
-      router.push("/login");
+      router.push("/login-regist/login");
     } catch (err) {
       setGlobalError("Gagal terhubung ke server. Coba lagi.");
     } finally {
@@ -169,6 +169,7 @@ export default function RegisterPage() {
             <label>Password</label>
             <input
               type="password"
+              value={form.password}
               placeholder="Masukkan password"
               onChange={(e) => {
                 setForm({ ...form, password: e.target.value });
@@ -182,6 +183,7 @@ export default function RegisterPage() {
             <label>Konfirmasi Password</label>
             <input
               type="password"
+              value={form.confirmPassword}
               placeholder="Masukkan ulang password"
               onChange={(e) => {
                 setForm({ ...form, confirmPassword: e.target.value });
@@ -214,7 +216,7 @@ export default function RegisterPage() {
 
           <p className="footer">
             Sudah punya akun?{" "}
-            <Link href="/login" className="link">
+            <Link href="/login-regist/login" className="link">
               Sign In
             </Link>
           </p>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "./../../lib/db";
+export const runtime = "nodejs";
 
 // DB → UI
 function mapStatus(dbStatus: string) {

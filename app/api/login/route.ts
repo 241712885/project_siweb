@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "../../lib/db";
+export const runtime = "nodejs";
 
 const ADMIN = {
   nama: "admin123",
@@ -10,9 +11,9 @@ const ADMIN = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nama, email, password } = await req.json();
+    const { email, password } = await req.json();
 
-    if (!nama || !email || !password) {
+    if (!email || !password) {
       return NextResponse.json(
         { message: "Semua field harus diisi" },
         { status: 400 }
@@ -21,7 +22,6 @@ export async function POST(req: NextRequest) {
 
     // Cek admin dulu
     if (
-      nama === ADMIN.nama &&
       email === ADMIN.email &&
       password === ADMIN.password
     ) {
@@ -37,9 +37,9 @@ export async function POST(req: NextRequest) {
     console.log("Mencoba login dengan:", { email, password }); // ← tambah ini
 
     const users = await sql`
-      SELECT id, nama, email, password, role  // ← tambah password di SELECT
+      SELECT id, nama, email, password, role
       FROM users
-      WHERE email = ${email}                   // ← hapus AND password dulu
+      WHERE email = ${email}
       LIMIT 1
     ` as any[];
 

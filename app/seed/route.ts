@@ -1,118 +1,237 @@
-import bcrypt from 'bcryptjs';
-import postgres from 'postgres';
-import { invoices, customers, revenue, users } from '../lib/placeholder-data';
+import bcrypt from "bcryptjs";
+import postgres from "postgres";
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
-
-async function seedUsers(sql: any) {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-  await sql`
-    CREATE TABLE IF NOT EXISTS users (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL,
-      role VARCHAR(50) NOT NULL DEFAULT 'pelanggan'
-    );
-  `;
-
-  const insertedUsers = await Promise.all(
-    users.map(async (user) => {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      return sql`
-        INSERT INTO users (id, name, email, password, role)
-        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword}, ${user.role ?? 'pelanggan'})
-        ON CONFLICT (id) DO NOTHING;
-      `;
-    }),
-  );
-
-  return insertedUsers;
-}
-
-async function seedInvoices(sql: any) {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS invoices (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID NOT NULL,
-      amount INT NOT NULL,
-      status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
-    );
-  `;
-
-  const insertedInvoices = await Promise.all(
-    invoices.map(
-      (invoice) => sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-    ),
-  );
-
-  return insertedInvoices;
-}
-
-async function seedCustomers(sql: any) {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS customers (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      image_url VARCHAR(255) NOT NULL
-    );
-  `;
-
-  const insertedCustomers = await Promise.all(
-    customers.map(
-      (customer) => sql`
-        INSERT INTO customers (id, name, email, image_url)
-        VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-    ),
-  );
-
-  return insertedCustomers;
-}
-
-async function seedRevenue(sql: any) {
-  await sql`
-    CREATE TABLE IF NOT EXISTS revenue (
-      month VARCHAR(4) NOT NULL UNIQUE,
-      revenue INT NOT NULL
-    );
-  `;
-
-  const insertedRevenue = await Promise.all(
-    revenue.map(
-      (rev) => sql`
-        INSERT INTO revenue (month, revenue)
-        VALUES (${rev.month}, ${rev.revenue})
-        ON CONFLICT (month) DO NOTHING;
-      `,
-    ),
-  );
-
-  return insertedRevenue;
-}
+const sql = postgres(process.env.POSTGRES_URL!, {
+  ssl: "require",
+});
 
 export async function GET() {
   try {
-    const result = await sql.begin(async (sql) => [
-      await seedUsers(sql),
-      await seedCustomers(sql),
-      await seedInvoices(sql),
-      await seedRevenue(sql),
-    ]);
+    const hashedPassword = await bcrypt.hash("123456", 10);
 
-    return Response.json({ message: 'Database seeded successfully' });
+    await sql.begin(async (sql) => {
+      // USERS
+      await sql`
+        INSERT INTO users
+        (id, nama, email, role, password, phone, address)
+        VALUES
+        (
+          1,
+          'Nella',
+          'nella@gmail.com',
+          'pelanggan',
+          ${hashedPassword},
+          '081234567890',
+          'Yogyakarta'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // DRIVER
+      await sql`
+        INSERT INTO driver
+        (id, nama, no_sim, no_telp, status)
+        VALUES
+        (
+          1,
+          'Budi Santoso',
+          'SIMA123456',
+          '081111111111',
+          'tersedia'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // JENIS PENGIRIMAN
+      await sql`
+        INSERT INTO jenis_pengiriman
+        (id, nama_jenis, estimasi, deskripsi, harga_per_kg)
+        VALUES
+        (
+          1,
+          'Express',
+          '1 Hari',
+          'Pengiriman cepat',
+          15000
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // KENDARAAN
+      await sql`
+        INSERT INTO kendaraan
+        (id, nama, jenis, plat, kapasitas, status)
+        VALUES
+        (
+          1,
+          'Motor Honda',
+          'Motor',
+          'AB1234CD',
+          50,
+          'tersedia'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // LOGIN LOGS
+      await sql`
+        INSERT INTO login_logs
+        (id, user_id, nama, email, role)
+        VALUES
+        (
+          1,
+          1,
+          'Nella',
+          'nella@gmail.com',
+          'pelanggan'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // ORDERS
+      await sql`
+        INSERT INTO orders
+        (id, receipt, sender, receiver, type, total)
+        VALUES
+        (
+          1,
+          'ORD001',
+          'Nella',
+          'Andi',
+          'paket kecil',
+          25000
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // PAKET
+      await sql`
+        INSERT INTO paket
+        (id, tipe_paket, berat, nama_barang, catatan)
+        VALUES
+        (
+          1,
+          'paket kecil',
+          2,
+          'Buku Pemrograman',
+          'Jangan dilipat'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // PEMESANAN
+      await sql`
+        INSERT INTO pemesanan
+        (
+          id,
+          no_resi,
+          id_customer,
+          id_jenis_pengiriman,
+          nama_pengirim,
+          no_telp_pengirim,
+          alamat_pengirim,
+          nama_penerima,
+          no_telp_penerima,
+          alamat_penerima,
+          berat,
+          total_harga,
+          metode_pembayaran,
+          status_pengiriman,
+          status_transaksi,
+          catatan,
+          tanggal_kirim,
+          id_driver,
+          id_kendaraan
+        )
+        VALUES
+        (
+          1,
+          'RESI001',
+          1,
+          1,
+          'Nella',
+          '081234567890',
+          'Yogyakarta',
+          'Andi',
+          '082222222222',
+          'Jakarta',
+          2,
+          30000,
+          'transfer',
+          'diproses',
+          'belum bayar',
+          'Barang mudah pecah',
+          CURRENT_DATE,
+          1,
+          1
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // TARIF
+      await sql`
+        INSERT INTO tarif
+        (
+          id,
+          id_kota_asal,
+          id_kota_tujuan,
+          id_jenis_pengiriman,
+          harga_per_kg,
+          jenis_pengiriman
+        )
+        VALUES
+        (
+          1,
+          1,
+          2,
+          1,
+          15000,
+          'Express'
+        )
+        ON CONFLICT (id) DO NOTHING;
+      `;
+
+      // TRANSAKSI
+      await sql`
+        INSERT INTO transaksi
+        (
+          resi,
+          id_user,
+          id_paket,
+          nama_pengirim,
+          nama_penerima,
+          total_harga,
+          status
+        )
+        VALUES
+        (
+          'RESI001',
+          1,
+          1,
+          'Nella',
+          'Andi',
+          30000,
+          'diproses'
+        )
+        ON CONFLICT (resi) DO NOTHING;
+      `;
+    });
+
+    return Response.json({
+      success: true,
+      message: "Database seeded successfully",
+    });
   } catch (error) {
-    return Response.json({ error }, { status: 500 });
+    console.error(error);
+
+    return Response.json(
+      {
+        success: false,
+        error,
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }

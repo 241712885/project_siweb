@@ -1,5 +1,11 @@
 import './globals.css';
+import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+
+export const metadata: Metadata = {
+  title: "PaketinAja",
+  description: "Layanan pengiriman paket cepat, aman, dan terpercaya.",
+};
 
 const poppins = Poppins({
   subsets: ["latin"],
