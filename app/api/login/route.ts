@@ -34,19 +34,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Cek ke database
+    console.log("Mencoba login dengan:", { email, password }); // ← tambah ini
+
     const users = await sql`
-      SELECT id, nama, email, role
+      SELECT id, nama, email, password, role  // ← tambah password di SELECT
       FROM users
-      WHERE email = ${email} AND password = ${password}
+      WHERE email = ${email}                   // ← hapus AND password dulu
       LIMIT 1
     ` as any[];
 
-    if (users.length === 0) {
-      return NextResponse.json(
-        { message: "Email atau password salah" },
-        { status: 401 }
-      );
-    }
+    console.log("User ditemukan:", users[0]);  // ← tambah ini
 
     const user = users[0];
 
@@ -64,8 +61,9 @@ export async function POST(req: NextRequest) {
     return response;
 
   } catch (error) {
+    console.error("Detail error:", error); // ← tambah ini
     return NextResponse.json(
-      { message: "Terjadi kesalahan server" },
+      { message: "Terjadi kesalahan server", detail: String(error) }, // ← tambah detail
       { status: 500 }
     );
   }
