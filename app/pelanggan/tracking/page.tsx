@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -127,7 +127,7 @@ function Stepper({ currentStep }: { currentStep: number }) {
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
-export default function TrackingPage() {
+function TrackingContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const resiParam    = searchParams.get("resi") ?? "";
@@ -315,5 +315,13 @@ export default function TrackingPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function TrackingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100 flex items-center justify-center text-gray-400 text-sm">Memuat...</div>}>
+      <TrackingContent />
+    </Suspense>
   );
 }
