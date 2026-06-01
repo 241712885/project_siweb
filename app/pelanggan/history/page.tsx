@@ -17,7 +17,7 @@ type ShipmentItem = {
 
 const shipments: ShipmentItem[] = [
   {
-    id: "CRG-2026-027",
+    id: "CGD-20260525-0001",
     sender: "Miranda",
     receiver: "Monica",
     date: "2026-04-28",
@@ -25,7 +25,7 @@ const shipments: ShipmentItem[] = [
     category: "Selesai",
   },
   {
-    id: "CRG-2026-026",
+    id: "CGD-20260525-0002",
     sender: "Jeremy",
     receiver: "Jeff",
     date: "2026-02-22",
@@ -33,7 +33,7 @@ const shipments: ShipmentItem[] = [
     category: "Proses",
   },
   {
-    id: "CRG-2026-022",
+    id: "CGD-20260525-0003",
     sender: "Putra",
     receiver: "Miranda",
     date: "2026-02-19",
@@ -41,7 +41,7 @@ const shipments: ShipmentItem[] = [
     category: "Proses",
   },
   {
-    id: "CRG-2026-014",
+    id: "CGD-20260525-0004",
     sender: "Miranda",
     receiver: "Adele",
     date: "2026-02-20",
@@ -49,7 +49,7 @@ const shipments: ShipmentItem[] = [
     category: "Proses",
   },
   {
-    id: "CRG-2026-025",
+    id: "CGD-20260525-0005",
     sender: "Deni",
     receiver: "Adit",
     date: "2026-04-30",

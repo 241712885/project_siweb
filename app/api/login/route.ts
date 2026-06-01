@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sql } from "../../lib/db";
 
 const ADMIN = {
   nama: "admin123",
@@ -24,25 +25,43 @@ export async function POST(req: NextRequest) {
       email === ADMIN.email &&
       password === ADMIN.password
     ) {
-      return NextResponse.json({
+      const response = NextResponse.json({
         message: "Login berhasil",
         role: "admin",
       });
+      response.cookies.set("user_role", "admin", { httpOnly: true, path: "/" });
+      return response;
     }
 
-    // Selain admin = pelanggan, asal field tidak kosong
-    // (validasi minimal: email harus ada @)
-    if (!email.includes("@")) {
+    // Cek ke database
+    const users = await sql`
+      SELECT id, nama, email, role
+      FROM users
+      WHERE email = ${email} AND password = ${password}
+      LIMIT 1
+    ` as any[];
+
+    if (users.length === 0) {
       return NextResponse.json(
-        { message: "Email tidak valid" },
-        { status: 400 }
+        { message: "Email atau password salah" },
+        { status: 401 }
       );
     }
 
-    return NextResponse.json({
+    const user = users[0];
+
+    const response = NextResponse.json({
       message: "Login berhasil",
-      role: "pelanggan",
+      role: user.role,
+      nama: user.nama,
     });
+
+    // Simpan id dan role user ke cookie
+    response.cookies.set("user_id", String(user.id), { httpOnly: true, path: "/" });
+    response.cookies.set("user_role", user.role, { httpOnly: true, path: "/" });
+    response.cookies.set("user_nama", user.nama, { httpOnly: true, path: "/" });
+
+    return response;
 
   } catch (error) {
     return NextResponse.json(

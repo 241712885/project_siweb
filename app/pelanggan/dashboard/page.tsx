@@ -6,6 +6,7 @@ export default function Dashboard() {
     const [open, setOpen] = useState(false);
     const menuClicked = () => setOpen(false);
     const router = useRouter();
+    const [resi, setResi] = useState("");
     
     const features = [
         {
@@ -138,9 +139,16 @@ export default function Dashboard() {
                         <input 
                             type="text" 
                             placeholder="Masukkan nomor resi..." 
+                            value={resi}
+                            onChange={(e) => setResi(e.target.value)}
                             className="flex-1 px-4 py-2 rounded-lg text-black focus:outline-none"
                         />
-                        <button className="bg-white text-green-600 px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
+                        <button 
+                            onClick={() => {
+                                if (!resi) return;
+                                router.push(`/pelanggan/tracking?resi=${encodeURIComponent(resi)}`);
+                            }}
+                            className="bg-white text-green-600 px-5 py-2 rounded-lg font-semibold hover:bg-gray-100 transition">
                             Lacak
                         </button>
                     </div>

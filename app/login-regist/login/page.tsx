@@ -158,8 +158,8 @@ export default function LoginPage() {
           <Image
             src="/LogoPaketinAja.jpeg"
             alt="logo"
-            width={45}
-            height={45}
+            width={80}
+            height={80}
             priority
             style={{ objectFit: "contain" }}
           />
