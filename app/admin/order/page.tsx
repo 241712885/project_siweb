@@ -27,6 +27,7 @@ export default function OrderManagement() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [kendaraans, setKendaraans] = useState<Kendaraan[]>([]);
   const [loadingDropdown, setLoadingDropdown] = useState(true);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "found" | "not_found">("idle");
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -122,8 +123,11 @@ export default function OrderManagement() {
 
     if (!form.weight || Number(form.weight) < 1)
       error.weight = "Berat minimal 1 kg";
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    if (!form.email) {
+      error.email = "Email pelanggan wajib diisi";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       error.email = "Format email salah";
+    }
     if (!form.metode_pembayaran) error.metode_pembayaran = "Pilih metode pembayaran";
     if (!form.idDriver) error.idDriver = "Pilih driver";
     if (!form.idKendaraan) error.idKendaraan = "Pilih kendaraan";
@@ -208,6 +212,7 @@ export default function OrderManagement() {
         idKendaraan: "",
         namaBarang: "",
       });
+      setEmailStatus("idle");
 
       // Re-fetch dropdown supaya driver/kendaraan yang baru dipakai tidak muncul lagi
       const [driverRes, kendaraanRes] = await Promise.all([
@@ -246,6 +251,21 @@ export default function OrderManagement() {
   const selectedKendaraan = kendaraans.find(
     (k) => k.id === Number(form.idKendaraan)
   );
+
+  const checkEmail = async (email: string) => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailStatus("idle");
+      return;
+    }
+    setEmailStatus("checking");
+    try {
+      const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      setEmailStatus(data.exists ? "found" : "not_found");
+    } catch {
+      setEmailStatus("idle");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
@@ -502,17 +522,30 @@ export default function OrderManagement() {
               <div className="flex flex-col gap-4">
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block">
-                    Email Pelanggan{" "}
-                    <span className="text-gray-400">(opsional)</span>
+                    Email Pelanggan <span className="text-red-400">*</span>
                   </label>
                   <input
                     name="email"
                     type="email"
                     value={form.email}
-                    onChange={handleChange}
-                    placeholder="untuk menghubungkan ke akun pelanggan"
+                    onChange={(e) => {
+                      setForm({ ...form, email: e.target.value });
+                      checkEmail(e.target.value);
+                    }}
+                    placeholder="Email pelanggan"
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
+
+                  {/* Feedback di bawah input email */}
+                  {emailStatus === "checking" && (
+                    <p className="text-gray-400 text-xs mt-1">Memeriksa email...</p>
+                  )}
+                  {emailStatus === "found" && (
+                    <p className="text-green-600 text-xs mt-1">✅ Pelanggan ditemukan</p>
+                  )}
+                  {emailStatus === "not_found" && (
+                    <p className="text-red-500 text-xs mt-1">⚠️ Email belum terdaftar — pelanggan tidak bisa melacak paket ini</p>
+                  )}
                   {errors.email && (
                     <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                   )}

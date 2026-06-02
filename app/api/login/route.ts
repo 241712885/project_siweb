@@ -21,14 +21,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Cek admin dulu
-    if (
-      email === ADMIN.email &&
-      password === ADMIN.password
-    ) {
+    if (email === ADMIN.email && password === ADMIN.password) {
       const response = NextResponse.json({
         message: "Login berhasil",
         role: "admin",
       });
+      response.cookies.set("user_nama", ADMIN.nama, { path: "/" }); // ← pakai ADMIN.nama
       response.cookies.set("user_role", "admin", { httpOnly: true, path: "/" });
       return response;
     }
@@ -56,7 +54,7 @@ export async function POST(req: NextRequest) {
     // Simpan id dan role user ke cookie
     response.cookies.set("user_id", String(user.id), { httpOnly: true, path: "/" });
     response.cookies.set("user_role", user.role, { httpOnly: true, path: "/" });
-    response.cookies.set("user_nama", user.nama, { httpOnly: true, path: "/" });
+    response.cookies.set("user_nama", user.nama, { path: "/" });
 
     return response;
 

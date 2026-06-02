@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
@@ -7,6 +7,7 @@ export default function Dashboard() {
     const menuClicked = () => setOpen(false);
     const router = useRouter();
     const [resi, setResi] = useState("");
+    const [userName, setUserName] = useState("");
     
     const features = [
         {
@@ -30,6 +31,22 @@ export default function Dashboard() {
             description:"Paket dijaga hingga sampai tujuan dengan aman."
         },
     ];
+
+    useEffect(() => {
+        const getCookie = (name: string) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop()?.split(";").shift() || "";
+            return "";
+        };
+        
+        const nama = getCookie("user_nama");
+        if (!nama) {
+            router.push("/login-regist/login"); 
+        } else {
+            setUserName(decodeURIComponent(nama));
+        }
+        }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
@@ -127,7 +144,7 @@ export default function Dashboard() {
                 {/* Content */}
                 <div className="px-10 py-10 space-y-6">
                     <div className="text-center">
-                        <h1 className="text-3xl md:text-4xl font-semibold text-emerald-950">Selamat Datang, Imanuella 👋</h1>
+                        <h1 className="text-3xl md:text-4xl font-semibold text-emerald-950">Selamat Datang, {userName} 👋</h1>
                         <p className="text-gray-600 mt-2 text-base md:text-lg">Lacak paketmu dengan mudah, cepat, dan tanpa ribet</p>
                     </div>
                 </div>

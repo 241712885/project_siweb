@@ -55,9 +55,7 @@ export async function POST(req: NextRequest) {
     // Cari id_customer dari email (opsional)
     let idCustomer = null;
     if (email) {
-      const users = await sql`
-        SELECT id FROM users WHERE email = ${email} LIMIT 1
-      ` as any[];
+      const users = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
       if (users.length > 0) idCustomer = users[0].id;
     }
 

@@ -1,91 +1,69 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Menu, Package, CalendarDays } from "lucide-react";
+import { Package } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type TabType = "Semua" | "Proses" | "Selesai";
 
 type ShipmentItem = {
   id: string;
-  sender: string;
-  receiver: string;
-  date: string;
-  status: string;
-  category: TabType;
+  no_resi: string;
+  nama_pengirim: string;
+  nama_penerima: string;
+  tanggal_kirim: string;
+  status_pengiriman: string;
 };
-
-const shipments: ShipmentItem[] = [
-  {
-    id: "CGD-20260525-0001",
-    sender: "Miranda",
-    receiver: "Monica",
-    date: "2026-04-28",
-    status: "Terkirim",
-    category: "Selesai",
-  },
-  {
-    id: "CGD-20260525-0002",
-    sender: "Jeremy",
-    receiver: "Jeff",
-    date: "2026-02-22",
-    status: "Menunggu pick up",
-    category: "Proses",
-  },
-  {
-    id: "CGD-20260525-0003",
-    sender: "Putra",
-    receiver: "Miranda",
-    date: "2026-02-19",
-    status: "Menunggu pick up",
-    category: "Proses",
-  },
-  {
-    id: "CGD-20260525-0004",
-    sender: "Miranda",
-    receiver: "Adele",
-    date: "2026-02-20",
-    status: "Menunggu pick up",
-    category: "Proses",
-  },
-  {
-    id: "CGD-20260525-0005",
-    sender: "Deni",
-    receiver: "Adit",
-    date: "2026-04-30",
-    status: "Terkirim",
-    category: "Selesai",
-  },
-];
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+    day: "2-digit", month: "2-digit", year: "numeric",
   });
 }
 
 export default function Page() {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [active, setActive] = useState("Riwayat");
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
   const [startDate, setStartDate] = useState("2026-02-01");
   const [endDate, setEndDate] = useState("2026-06-30");
-  const router = useRouter();
+  const [shipments, setShipments] = useState<ShipmentItem[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const fetchRiwayat = async () => {
+      try {
+        const res = await fetch("/api/riwayat");
+        if (!res.ok) {
+          if (res.status === 401) { router.push("/login"); return; }
+          return;
+        }
+        const json = await res.json();
+        setShipments(Array.isArray(json.data) ? json.data : []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchRiwayat();
+  }, []);
 
   const filteredShipments = useMemo(() => {
     return shipments.filter((item) => {
+      const status = item.status_pengiriman;
       const matchTab =
-        activeTab === "Semua" ? true : item.category === activeTab;
+        activeTab === "Semua" ? true :
+        activeTab === "Proses" ? ["pending", "diproses", "dalam pengiriman"].includes(status) :
+        status === "selesai";
 
-      const itemDate = new Date(item.date).getTime();
+      const itemDate = new Date(item.tanggal_kirim).getTime();
       const start = startDate ? new Date(startDate).getTime() : -Infinity;
-      const end = endDate ? new Date(endDate).getTime() : Infinity;
+      const end   = endDate   ? new Date(endDate).getTime()   : Infinity;
 
       return matchTab && itemDate >= start && itemDate <= end;
     });
-  }, [activeTab, startDate, endDate]);
+  }, [shipments, activeTab, startDate, endDate]);
 
   return (
     <div className="min-h-screen bg-[#DFF5EC] text-slate-800">
@@ -243,7 +221,7 @@ export default function Page() {
 
             <section className="mt-10 space-y-6">
               {filteredShipments.map((item) => {
-                const isDelivered = item.status === "Terkirim";
+                const isDelivered = item.status_pengiriman === "Terkirim";
 
                 return (
                   <div
@@ -256,18 +234,16 @@ export default function Page() {
                       </div>
 
                       <div>
-                        <p className="text-sm font-medium text-slate-500">
-                          {item.id}
-                        </p>
+                        <p className="text-sm font-medium text-slate-500">{item.no_resi}</p>
                         <p className="text-[16px] text-slate-600">
-                          {item.sender} <span className="mx-1">→</span> {item.receiver}
+                          {item.nama_pengirim} <span className="mx-1">→</span> {item.nama_penerima}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between gap-4 sm:justify-end">
                       <span className="text-[16px] font-bold text-slate-700">
-                        {formatDate(item.date)}
+                        {formatDate(item.tanggal_kirim)}
                       </span>
 
                       <span
@@ -277,7 +253,7 @@ export default function Page() {
                             : "bg-[#FFE8B5] text-[#C28A06]"
                         }`}
                       >
-                        {item.status}
+                        {item.status_pengiriman}
                       </span>
                     </div>
                   </div>
