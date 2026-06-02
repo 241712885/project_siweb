@@ -49,23 +49,19 @@ export async function POST(req: NextRequest) {
       namaBarang,
     } = await req.json();
 
-    // Generate no resi
     const noResi = "PKT-" + Date.now();
 
-    // Cari id_customer dari email (opsional)
     let idCustomer = null;
     if (email) {
       const users = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
       if (users.length > 0) idCustomer = users[0].id;
     }
 
-    // Cari id_jenis_pengiriman dari tipe paket
     const jenisList = await sql`
       SELECT id FROM jenis_pengiriman WHERE nama_jenis = ${type} LIMIT 1
     ` as any[];
     const idJenisPengiriman = jenisList.length > 0 ? jenisList[0].id : null;
 
-    // Insert pesanan
     await sql`
       INSERT INTO pemesanan (
         nama_pengirim, no_telp_pengirim, alamat_pengirim,
@@ -84,7 +80,6 @@ export async function POST(req: NextRequest) {
       )
     `;
 
-    // Update status driver & kendaraan jadi tidak tersedia
     await sql`UPDATE driver SET status = 'bertugas' WHERE id = ${Number(idDriver)}`;
     await sql`UPDATE kendaraan SET status = 'digunakan' WHERE id = ${Number(idKendaraan)}`;
 

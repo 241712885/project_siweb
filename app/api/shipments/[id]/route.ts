@@ -18,10 +18,10 @@ function reverseStatus(status: string) {
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }  // ← Promise<>
+  { params }: { params: Promise<{ id: string }> } 
 ) {
   try {
-    const { id } = await params;  // ← await params
+    const { id } = await params; 
     const body = await req.json();
 
     if (!body.status) {

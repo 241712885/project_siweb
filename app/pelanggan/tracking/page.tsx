@@ -255,7 +255,6 @@ function TrackingContent() {
         {/* Result */}
         {data && !loading && statusCfg && (
           <>
-            {/* Status + Stepper */}
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className={`px-6 py-4 ${statusCfg.bg} ${statusCfg.border} border-b flex items-center gap-3`}>
                 <span className={`w-2.5 h-2.5 rounded-full ${statusCfg.dot} flex-shrink-0`} />
@@ -267,7 +266,6 @@ function TrackingContent() {
               </div>
             </div>
 
-            {/* Pengirim → Penerima */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h2 className="text-sm font-semibold text-gray-700 mb-4">Informasi Pengiriman</h2>
               <div className="flex items-start gap-3">
@@ -291,7 +289,6 @@ function TrackingContent() {
               </div>
             </div>
 
-            {/* Detail paket */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h2 className="text-sm font-semibold text-gray-700 mb-4">Detail Paket</h2>
               <div className="grid grid-cols-2 gap-4">

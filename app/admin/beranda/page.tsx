@@ -212,8 +212,6 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <>
-              {/* ── STAT CARDS ─────────────────────────────────────────────── */}
-              {/* Baris 1: Status pengiriman */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 <Card title="Total Pesanan" value={total}    color="text-gray-800"   icon={<Package      className="w-5 h-5" />} />
                 <Card title="Di Gudang"     value={gudang}   color="text-yellow-600" icon={<Warehouse    className="w-5 h-5" />} />
@@ -221,7 +219,6 @@ export default function AdminDashboard() {
                 <Card title="Selesai"       value={terkirim} color="text-green-600"  icon={<CheckCircle2 className="w-5 h-5" />} />
               </div>
 
-              {/* Baris 2: Pendapatan (dipisah + total) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <CardMoney
                   title="Pendapatan Tunai"
@@ -247,10 +244,8 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              {/* ── ROW 1: Chart Status + Chart Donut ──────────────────────── */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-                {/* Chart 1 – Bar status pengiriman */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-6 text-sm sm:text-base flex items-center gap-2">
                     <BarChart3 className="w-4 h-4 text-green-600" />
@@ -263,7 +258,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Chart 2 – Donut proporsi status (BARU) */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
                     <PieChart className="w-4 h-4 text-green-600" />
@@ -273,10 +267,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* ── ROW 2: Chart Pendapatan + Chart Tren Harian ────────────── */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
 
-                {/* Chart 3 – Bar pendapatan per metode */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-6 text-sm sm:text-base flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-green-600" />
@@ -288,7 +280,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Chart 4 – Tren pesanan per hari (BARU) */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-blue-500" />
@@ -303,10 +294,9 @@ export default function AdminDashboard() {
                           const { total: t, selesai: s } = trendMap[day];
                           const heightTotal   = Math.max((t / trendMax) * 120, t > 0 ? 6 : 0);
                           const heightSelesai = Math.max((s / trendMax) * 120, s > 0 ? 4 : 0);
-                          const label = day.slice(5); // "MM-DD"
+                          const label = day.slice(5); 
                           return (
                             <div key={day} className="flex flex-col items-center gap-0.5 group relative">
-                              {/* tooltip */}
                               <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10">
                                 <div className="bg-gray-800 text-white text-[10px] rounded px-2 py-1 whitespace-nowrap">
                                   {day}<br/>Total: {t} | Selesai: {s}
@@ -325,7 +315,6 @@ export default function AdminDashboard() {
                           );
                         })}
                       </div>
-                      {/* legend */}
                       <div className="flex gap-4 mt-3 text-xs text-gray-500">
                         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-blue-300 inline-block" />Total</span>
                         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-green-500 inline-block" />Selesai</span>
@@ -335,7 +324,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* ── Tabel 5 Pesanan Terbaru ────────────────────────────────── */}
               <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                 <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
                   <ClipboardList className="w-4 h-4 text-green-600" />
@@ -469,7 +457,6 @@ function DonutChart({
   return (
     <div className="flex flex-col sm:flex-row items-center gap-6">
       <svg width="140" height="140" viewBox="0 0 140 140" className="shrink-0">
-        {/* background circle */}
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F3F4F6" strokeWidth={stroke} />
         {slices.map((s, i) => (
           <circle

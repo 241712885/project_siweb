@@ -269,7 +269,6 @@ export default function OrderManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
-      {/* Overlay sidebar */}
       {open && (
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
@@ -277,7 +276,6 @@ export default function OrderManagement() {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
@@ -372,9 +370,7 @@ export default function OrderManagement() {
         <div className="px-10 py-10">
           <h1 className="text-2xl font-bold mb-6">Input Pesanan Baru</h1>
 
-          {/* Data Pengirim & Penerima */}
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Pengirim */}
             <div className="bg-white p-6 rounded-2xl shadow space-y-2">
               <h2 className="font-semibold mb-4 text-green-700">
                 Data Pengirim
@@ -458,7 +454,6 @@ export default function OrderManagement() {
             <h2 className="font-semibold mb-6 text-green-700">Detail Paket</h2>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Kiri */}
               <div className="flex flex-col gap-4">
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block">
@@ -518,7 +513,6 @@ export default function OrderManagement() {
                 </div>
               </div>
 
-              {/* Tengah */}
               <div className="flex flex-col gap-4">
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block">
@@ -536,7 +530,6 @@ export default function OrderManagement() {
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
 
-                  {/* Feedback di bawah input email */}
                   {emailStatus === "checking" && (
                     <p className="text-gray-400 text-xs mt-1">Memeriksa email...</p>
                   )}
@@ -561,7 +554,6 @@ export default function OrderManagement() {
                 </div>
               </div>
 
-              {/* Kanan */}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600 mb-1 block">
                   Catatan
@@ -608,7 +600,6 @@ export default function OrderManagement() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Pilih Driver */}
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block">
                     Pilih Driver
@@ -637,7 +628,6 @@ export default function OrderManagement() {
                       {errors.idDriver}
                     </p>
                   )}
-                  {/* Info driver terpilih */}
                   {selectedDriver && (
                     <div className="mt-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-800">
                       <p className="font-medium">{selectedDriver.nama_driver}</p>
@@ -677,7 +667,6 @@ export default function OrderManagement() {
                       {errors.idKendaraan}
                     </p>
                   )}
-                  {/* Info kendaraan terpilih */}
                   {selectedKendaraan && (
                     <div className="mt-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-800">
                       <p className="font-medium">
@@ -772,12 +761,9 @@ export default function OrderManagement() {
       {showSuccess && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-3xl text-center w-full max-w-[360px] shadow-2xl overflow-hidden">
-            {/* Body */}
             <div className="px-10 pt-10 pb-8">
-              {/* Ikon centang berlapis */}
               <div className="flex items-center justify-center mx-auto mb-6 w-20 h-20 rounded-full bg-green-100">
                 <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-md">
-                  {/* Checkmark SVG */}
                   <svg
                     className="w-7 h-7 text-white"
                     fill="none"
@@ -794,14 +780,12 @@ export default function OrderManagement() {
                 </div>
               </div>
 
-              {/* Judul */}
               <h2 className="text-2xl font-extrabold text-gray-900 leading-snug">
                 Pesanan Telah
                 <br />
                 Tersimpan!
               </h2>
 
-              {/* Nomor resi */}
               <p className="mt-4 text-gray-500 text-sm">
                 Nomor resi Anda adalah{" "}
                 <span className="text-green-600 font-bold tracking-wide">
@@ -809,13 +793,11 @@ export default function OrderManagement() {
                 </span>
               </p>
 
-              {/* Sub-teks */}
               <p className="mt-1 text-gray-400 text-sm">
                 Pesanan sedang diproses.
               </p>
             </div>
 
-            {/* Tombol Tutup */}
             <div className="px-6 pb-8">
               <button
                 onClick={() => {

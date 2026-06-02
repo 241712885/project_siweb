@@ -10,7 +10,6 @@ export async function GET() {
     const hashedPassword = await bcrypt.hash("123456", 10);
 
     await sql.begin(async (sql) => {
-      // USERS
       await sql`
         INSERT INTO users
         (id, nama, email, role, password, phone, address)
@@ -27,7 +26,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // DRIVER
       await sql`
         INSERT INTO driver
         (id, nama, no_sim, no_telp, status)
@@ -42,7 +40,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // JENIS PENGIRIMAN
       await sql`
         INSERT INTO jenis_pengiriman
         (id, nama_jenis, estimasi, deskripsi, harga_per_kg)
@@ -57,7 +54,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // KENDARAAN
       await sql`
         INSERT INTO kendaraan
         (id, nama, jenis, plat, kapasitas, status)
@@ -73,7 +69,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // LOGIN LOGS
       await sql`
         INSERT INTO login_logs
         (id, user_id, nama, email, role)
@@ -88,7 +83,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // ORDERS
       await sql`
         INSERT INTO orders
         (id, receipt, sender, receiver, type, total)
@@ -104,7 +98,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // PAKET
       await sql`
         INSERT INTO paket
         (id, tipe_paket, berat, nama_barang, catatan)
@@ -119,7 +112,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // PEMESANAN
       await sql`
         INSERT INTO pemesanan
         (
@@ -168,7 +160,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // TARIF
       await sql`
         INSERT INTO tarif
         (
@@ -191,7 +182,6 @@ export async function GET() {
         ON CONFLICT (id) DO NOTHING;
       `;
 
-      // TRANSAKSI
       await sql`
         INSERT INTO transaksi
         (

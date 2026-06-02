@@ -1,4 +1,3 @@
-// app/api/user/riwayat/route.ts
 import { sql } from "../../lib/db";
 import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";

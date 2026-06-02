@@ -151,20 +151,17 @@ export default function ProfilePage() {
               <>
                 {errors.submit && <p className="text-red-500 text-sm mb-3">{errors.submit}</p>}
 
-                {/* NAMA (read only) */}
                 <div className="mb-4">
                   <label>Nama</label>
                   <input value={form.nama} disabled className="w-full px-4 py-2 border rounded-lg mt-1 bg-gray-50 text-gray-500 cursor-not-allowed" />
                 </div>
 
-                {/* EMAIL */}
                 <div className="mb-4">
                   <label>Email</label>
                   <input name="email" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
                   <p className="text-red-500 text-sm">{errors.email}</p>
                 </div>
 
-                {/* PASSWORD */}
                 <div className="mb-4">
                   <label>Password Baru <span className="text-gray-400 text-xs">(kosongkan jika tidak ingin mengubah)</span></label>
                   <div className="relative mt-1">
@@ -182,14 +179,12 @@ export default function ProfilePage() {
                   <p className="text-red-500 text-sm">{errors.password}</p>
                 </div>
 
-                {/* PHONE */}
                 <div className="mb-4">
                   <label>Nomor Telepon</label>
                   <input name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
                   <p className="text-red-500 text-sm">{errors.phone}</p>
                 </div>
 
-                {/* ADDRESS */}
                 <div className="mb-4">
                   <label>Alamat</label>
                   <input name="address" value={form.address} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
