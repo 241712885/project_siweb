@@ -19,7 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={poppins.className}>{children}</body>
+      <body className={poppins.className} style={{ backgroundColor: "#2BAB6F", margin: 0 }}>
+        {children}
+      </body>
     </html>
   );
 }

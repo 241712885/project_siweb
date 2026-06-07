@@ -21,13 +21,14 @@ export default function RegisterPage() {
   const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
   const captchaCode = "xDM72w";
-
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.toLowerCase().includes(".com");
+  };
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     setGlobalError("");
 
-    // Validasi form di sisi client
     let newError: any = {};
 
     if (!form.username) {
@@ -38,8 +39,8 @@ export default function RegisterPage() {
 
     if (!form.email) {
       newError.email = "Email tidak boleh kosong";
-    } else if (!form.email.includes("@")) {
-      newError.email = "Email harus mengandung @";
+    } else if (!isValidEmail(form.email)) {
+      newError.email = "Email tidak valid (contoh: nama@email.com)";
     }
 
     if (!form.phone) {
@@ -72,7 +73,6 @@ export default function RegisterPage() {
 
     if (Object.keys(newError).length > 0) return;
 
-    // Kirim ke API
     try {
       setLoading(true);
 
@@ -91,12 +91,24 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        // Tampilkan error dari server (misal email/username sudah terdaftar)
-        setGlobalError(data.message || "Registrasi gagal");
+        if (res.status === 409) {
+          if (data.field === "email") {
+            setError((prev: any) => ({ ...prev, email: "Email sudah digunakan" }));
+          } else if (data.field === "nama" || data.field === "username") {
+            setError((prev: any) => ({ ...prev, username: "Username sudah digunakan" }));
+          } else if (data.field === "phone") {
+            setError((prev: any) => ({ ...prev, phone: "Nomor telepon sudah digunakan" }));
+          } else {
+            setGlobalError(data.message || "Data sudah terdaftar");
+          }
+        } else if (res.status === 400) {
+          setGlobalError(data.message || "Data yang dimasukkan tidak valid");
+        } else {
+          setGlobalError(data.message || "Registrasi gagal. Coba lagi.");
+        }
         return;
       }
 
-      // Registrasi berhasil, redirect ke login
       router.push("/login-regist/login");
     } catch (err) {
       setGlobalError("Gagal terhubung ke server. Coba lagi.");

@@ -53,10 +53,33 @@ export default function ProfilePage() {
 
   const validate = () => {
     const newErrors: any = {};
-    if (!form.email.includes("@")) newErrors.email = "Format email salah, harus menggunakan (@)";
-    if (form.password.length > 0 && form.password.length < 8) newErrors.password = "Password minimal 8 karakter";
-    if (form.phone.length < 10) newErrors.phone = "Nomor telepon minimal 10 digit";
-    if (!form.address.trim()) newErrors.address = "Alamat belum lengkap (contoh: jalan, nomor, kota)";
+
+    // Email
+    if (!form.email.trim()) {
+      newErrors.email = "Email wajib diisi";
+    } else if (!form.email.includes("@")) {
+      newErrors.email = "Format email salah, harus menggunakan (@)";
+    }
+
+    // Password
+    if (form.password.length > 0 && form.password.length < 8) {
+      newErrors.password = "Password minimal 8 karakter";
+    }
+
+    // Nomor Telepon
+    if (!form.phone.trim()) {
+      newErrors.phone = "Nomor telepon wajib diisi";
+    } else if (form.phone.length < 10) {
+      newErrors.phone = "Nomor telepon minimal 10 digit";
+    }
+
+    // Alamat
+    if (!form.address.trim()) {
+      newErrors.address = "Alamat wajib diisi";
+    } else if (form.address.trim().length < 15) {
+      newErrors.address = "Alamat minimal 15 karakter";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

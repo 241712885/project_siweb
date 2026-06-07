@@ -1,8 +1,20 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useState } from "react"; 
 
 export default function KeluarPage() {
     const router = useRouter();
+    const [loading, setLoading] = useState(false); // [TAMBAH]
+
+    const handleLogout = async () => {
+        setLoading(true);
+        try {
+            await fetch("/api/logout", { method: "POST" });
+        } catch (err) {
+        } finally {
+            router.push("/login-regist/login");
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-green-600">
@@ -23,10 +35,11 @@ export default function KeluarPage() {
                     </button>
 
                     <button
-                        onClick={() => router.push("/")}
+                        onClick={handleLogout}
+                        disabled={loading}
                         className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
-                        Ya
+                        {loading ? "Keluar..." : "Ya"}
                     </button>
                 </div>
             </div>

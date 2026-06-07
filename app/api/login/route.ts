@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Login admin
     if (email === ADMIN.email && password === ADMIN.password) {
       const response = NextResponse.json({
         message: "Login berhasil",
@@ -27,12 +28,18 @@ export async function POST(req: NextRequest) {
       });
       response.cookies.set("user_nama", ADMIN.nama, { path: "/" });
       response.cookies.set("user_role", "admin", { httpOnly: true, path: "/" });
+      // [TAMBAH] Set cookie session agar middleware mengenali admin sebagai sudah login
+      response.cookies.set("session", "admin", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      });
       return response;
     }
 
     // Cek ke database
-    console.log("Mencoba login dengan:", { email, password });
-
     const users = await sql`
       SELECT id, nama, email, password, role
       FROM users
@@ -40,26 +47,47 @@ export async function POST(req: NextRequest) {
       LIMIT 1
     ` as any[];
 
-    console.log("User ditemukan:", users[0]); 
-
     const user = users[0];
+    console.log("Password dari DB:", JSON.stringify(user.password));
+    console.log("Password dari input:", JSON.stringify(password));
+    console.log("Sama?", password === user.password);
 
+    // [TAMBAH] Cek apakah user ditemukan
+    if (!user) {
+      return NextResponse.json(
+        { message: "Email tidak terdaftar" },
+        { status: 404 }
+      );
+    }
+
+    // [TAMBAH] Verifikasi password plain text
+    if (password !== user.password) {
+      return NextResponse.json(
+        { message: "Password salah" },
+        { status: 401 }
+      );
+    }
+
+    // Login berhasil — set session cookie
     const response = NextResponse.json({
       message: "Login berhasil",
       role: user.role,
-      nama: user.nama,
     });
 
-    response.cookies.set("user_id", String(user.id), { httpOnly: true, path: "/" });
-    response.cookies.set("user_role", user.role, { httpOnly: true, path: "/" });
-    response.cookies.set("user_nama", user.nama, { path: "/" });
+    response.cookies.set("session", user.id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
 
     return response;
 
   } catch (error) {
-    console.error("Detail error:", error); 
+    console.error("Detail error:", error);
     return NextResponse.json(
-      { message: "Terjadi kesalahan server", detail: String(error) }, 
+      { message: "Terjadi kesalahan server", detail: String(error) },
       { status: 500 }
     );
   }

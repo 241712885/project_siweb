@@ -20,6 +20,9 @@ export default function LoginPage() {
 
   const [error, setError] = useState<any>({});
   const [globalError, setGlobalError] = useState("");
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.toLowerCase().includes(".com");
+  };
 
   useEffect(() => {
     const savedAttempt = localStorage.getItem("attempt");
@@ -55,23 +58,14 @@ export default function LoginPage() {
 
     setGlobalError("");
 
-    // Validasi form di sisi client
     let newError: any = {};
     let valid = true;
-
-    if (!form.nama) {
-      newError.nama = "Nama tidak boleh kosong";
-      valid = false;
-    } else if (form.nama.length < 5) {
-      newError.nama = "Nama minimal 5 karakter";
-      valid = false;
-    }
 
     if (!form.email) {
       newError.email = "Email tidak boleh kosong";
       valid = false;
-    } else if (!form.email.includes("@")) {
-      newError.email = "Email tidak valid (harus ada @)";
+    } else if (!isValidEmail(form.email)) {
+      newError.email = "Email tidak valid (contoh: nama@email.com)";
       valid = false;
     }
 
@@ -94,7 +88,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Kirim ke API
     try {
       setLoading(true);
 
@@ -102,7 +95,6 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nama: form.nama,
           email: form.email,
           password: form.password,
         }),
@@ -111,21 +103,25 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setGlobalError(data.message || "Login gagal");
+        if (res.status === 404) {
+          setError((prev: any) => ({ ...prev, email: "Email tidak terdaftar" }));
+        } else if (res.status === 401) {
+          setError((prev: any) => ({ ...prev, password: "Password salah" }));
+        } else {
+          setGlobalError(data.message || "Login gagal");
+        }
         setAttempt((prev) => prev + 1);
         generateCaptcha();
         setInputCaptcha("");
         return;
       }
 
-      // Login berhasil — reset state
       setAttempt(0);
       localStorage.removeItem("attempt");
       setGlobalError("");
       setError({});
       setInputCaptcha("");
 
-      // Redirect berdasarkan role dari database
       if (data.role === "admin") {
         router.push("/admin/beranda");
       } else if (data.role === "pelanggan") {
@@ -169,20 +165,6 @@ export default function LoginPage() {
         <p className="subtitle">Sign in to continue</p>
 
         <form onSubmit={handleSubmit}>
-
-          <div className="field">
-            <label>Nama</label>
-            <input
-              placeholder="Masukkan nama"
-              value={form.nama}
-              onChange={(e) => {
-                setForm({ ...form, nama: e.target.value });
-                setGlobalError("");
-              }}
-            />
-            <span className="error">{error.nama}</span>
-          </div>
-
           <div className="field">
             <label>Email</label>
             <input
