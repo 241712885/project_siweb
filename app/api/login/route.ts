@@ -28,7 +28,6 @@ export async function POST(req: NextRequest) {
       });
       response.cookies.set("user_nama", ADMIN.nama, { path: "/" });
       response.cookies.set("user_role", "admin", { httpOnly: true, path: "/" });
-      // [TAMBAH] Set cookie session agar middleware mengenali admin sebagai sudah login
       response.cookies.set("session", "admin", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -48,11 +47,7 @@ export async function POST(req: NextRequest) {
     ` as any[];
 
     const user = users[0];
-    console.log("Password dari DB:", JSON.stringify(user.password));
-    console.log("Password dari input:", JSON.stringify(password));
-    console.log("Sama?", password === user.password);
 
-    // [TAMBAH] Cek apakah user ditemukan
     if (!user) {
       return NextResponse.json(
         { message: "Email tidak terdaftar" },
@@ -60,7 +55,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // [TAMBAH] Verifikasi password plain text
     if (password !== user.password) {
       return NextResponse.json(
         { message: "Password salah" },
@@ -68,13 +62,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Login berhasil — set session cookie
     const response = NextResponse.json({
       message: "Login berhasil",
       role: user.role,
     });
 
+    // ✅ FIX: Set KEDUA cookie — "session" dan "user_id"
     response.cookies.set("session", user.id.toString(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    response.cookies.set("user_id", user.id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

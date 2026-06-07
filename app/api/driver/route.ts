@@ -67,11 +67,23 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    const result = await sql`
-      DELETE FROM driver WHERE id = ${id} RETURNING *
-    `;
+    const cek = await sql`
+      SELECT COUNT(*) as total 
+      FROM pemesanan 
+      WHERE id_driver = ${Number(id)}
+        AND status_pengiriman != 'selesai'
+    ` as any[];
 
+    if (Number(cek[0].total) > 0) {
+      return NextResponse.json(
+        { error: "Driver tidak dapat dihapus karena masih memiliki pesanan yang belum selesai." },
+        { status: 400 }
+      );
+    }
+
+    await sql`DELETE FROM driver WHERE id = ${Number(id)}`;
     return NextResponse.json({ success: true });
+
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }

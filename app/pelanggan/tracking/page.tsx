@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types
 type StatusPengiriman = "pending" | "diproses" | "dalam pengiriman" | "selesai";
 
 interface PemesananData {
@@ -25,6 +25,7 @@ interface PemesananData {
   jenis_pengiriman: string | null;
   estimasi_hari: number | null;
   nama_customer: string | null;
+  nama_barang: string | null;
 }
 
 interface ApiResponse {
@@ -42,7 +43,7 @@ interface StatusConfig {
   step: number;
 }
 
-// ─── Status config ────────────────────────────────────────────────────────────
+// Status config
 const STATUS_CONFIG: Record<StatusPengiriman, StatusConfig> = {
   pending:            { label: "Menunggu Konfirmasi", color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", dot: "bg-yellow-400", step: 0 },
   diproses:           { label: "Sedang Diproses",     color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-200",   dot: "bg-blue-400",   step: 1 },
@@ -62,7 +63,7 @@ function getStatus(key: string | undefined): StatusConfig {
   return STATUS_CONFIG[key.toLowerCase() as StatusPengiriman] ?? defaultStatus;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 function formatDate(val: string | null | undefined): string {
   if (!val) return "-";
   return new Date(val).toLocaleString("id-ID", {
@@ -78,7 +79,7 @@ function formatRupiah(val: number | null | undefined): string {
   }).format(val);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// Sub-components
 function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse bg-gray-200 rounded-lg ${className}`} />;
 }
@@ -126,7 +127,7 @@ function Stepper({ currentStep }: { currentStep: number }) {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// Main page 
 function TrackingContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
@@ -167,8 +168,22 @@ function TrackingContent() {
 
   function handleLacak(): void {
     const trimmed = inputResi.trim();
-    if (!trimmed) { setError("Masukkan nomor resi terlebih dahulu."); return; }
-    router.replace(`/pelanggan/tracking?resi=${encodeURIComponent(trimmed)}`, { scroll: false });
+
+    if (!trimmed) {
+      setError("Masukkan nomor resi terlebih dahulu.");
+      return;
+    }
+
+    if (trimmed.length < 5) {
+      setError("Nomor resi tidak valid.");
+      return;
+    }
+
+    router.replace(
+      `/pelanggan/tracking?resi=${encodeURIComponent(trimmed)}`,
+      { scroll: false }
+    );
+
     fetchTracking(trimmed);
   }
 
@@ -295,6 +310,7 @@ function TrackingContent() {
                 <InfoRow label="Jenis Pengiriman"  value={data.jenis_pengiriman} />
                 <InfoRow label="Estimasi Tiba"     value={data.estimasi_hari ? `${data.estimasi_hari} hari kerja` : null} />
                 <InfoRow label="Berat"             value={data.berat ? `${data.berat} kg` : null} />
+                <InfoRow label="Nama Barang" value={data.nama_barang} />
                 <InfoRow label="Total Harga"       value={formatRupiah(data.total_harga)} />
                 <InfoRow label="Metode Pembayaran" value={data.metode_pembayaran} />
                 <InfoRow label="Status Pembayaran" value={data.status_transaksi} />

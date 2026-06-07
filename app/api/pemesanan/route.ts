@@ -17,9 +17,7 @@ export async function GET(req: NextRequest) {
         ORDER BY id DESC
       `;
     } else {
-      data = await sql`
-        SELECT * FROM pemesanan ORDER BY id DESC
-      `;
+      data = await sql`SELECT * FROM pemesanan ORDER BY id DESC`;
     }
 
     return NextResponse.json({ data });
@@ -32,35 +30,38 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const {
-      senderName,
-      senderPhone,
-      senderAddress,
-      receiverName,
-      receiverPhone,
-      receiverAddress,
-      type,
-      weight,
-      total,
-      metode_pembayaran,
-      notes,
-      email,
-      idDriver,
-      idKendaraan,
-      namaBarang,
+      senderName, senderPhone, senderAddress,
+      receiverName, receiverPhone, receiverAddress,
+      type, weight, total, metode_pembayaran,
+      notes, email, idDriver, idKendaraan, namaBarang,
     } = await req.json();
 
     const noResi = "PKT-" + Date.now();
 
+    // Cari id_customer dari email
     let idCustomer = null;
     if (email) {
-      const users = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+      const users = await sql`
+        SELECT id FROM users WHERE email = ${email} LIMIT 1
+      `;
       if (users.length > 0) idCustomer = users[0].id;
+    }
+
+    // ✅ FIX: Tolak jika email tidak terdaftar
+    if (!idCustomer) {
+      return NextResponse.json(
+        { error: "Email pelanggan tidak terdaftar. Minta pelanggan daftar akun terlebih dahulu." },
+        { status: 400 }
+      );
     }
 
     const jenisList = await sql`
       SELECT id FROM jenis_pengiriman WHERE nama_jenis = ${type} LIMIT 1
     ` as any[];
     const idJenisPengiriman = jenisList.length > 0 ? jenisList[0].id : null;
+
+    // ✅ FIX: status_transaksi sesuai metode pembayaran
+    const statusTransaksi = metode_pembayaran === "tunai" ? "lunas" : "belum bayar";
 
     await sql`
       INSERT INTO pemesanan (
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
         ${senderName}, ${senderPhone}, ${senderAddress},
         ${receiverName}, ${receiverPhone}, ${receiverAddress},
         ${Number(weight)}, ${total}, ${metode_pembayaran},
-        ${notes || null}, ${noResi}, 'pending', 'belum bayar',
+        ${notes || null}, ${noResi}, 'pending', ${statusTransaksi},
         CURRENT_DATE, ${idCustomer}, ${idJenisPengiriman},
         ${Number(idDriver)}, ${Number(idKendaraan)}, ${namaBarang}
       )

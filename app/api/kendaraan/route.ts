@@ -96,19 +96,24 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ error: "ID tidak ditemukan" }, { status: 400 });
+    // ✅ Cek pesanan yang belum selesai
+    const cek = await sql`
+      SELECT COUNT(*) as total 
+      FROM pemesanan 
+      WHERE id_kendaraan = ${Number(id)}
+        AND status_pengiriman != 'selesai'
+    ` as any[];
+
+    if (Number(cek[0].total) > 0) {
+      return NextResponse.json(
+        { error: "Kendaraan tidak dapat dihapus karena masih digunakan dalam pesanan yang belum selesai." },
+        { status: 400 }
+      );
     }
 
-    const result = await sql`
-      DELETE FROM kendaraan WHERE id = ${id} RETURNING *
-    `;
-
-    if (result.length === 0) {
-      return NextResponse.json({ error: "Kendaraan tidak ditemukan" }, { status: 404 });
-    }
-
+    await sql`DELETE FROM kendaraan WHERE id = ${Number(id)}`;
     return NextResponse.json({ success: true });
+
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }

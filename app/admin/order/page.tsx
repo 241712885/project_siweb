@@ -195,6 +195,16 @@ export default function OrderManagement() {
       }
 
       setResi(data.no_resi);
+      await fetch("/api/kirim-email-resi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          no_resi: data.no_resi,
+          total: totalPrice(),
+          metode_pembayaran: form.metode_pembayaran,
+        }),
+      });
 
       setForm({
         senderName: "",

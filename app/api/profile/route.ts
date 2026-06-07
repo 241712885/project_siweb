@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
+    const userId = req.cookies.get("session")?.value;
 
     if (!userId) {
       return NextResponse.json({ message: "Belum login" }, { status: 401 });
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
+    const userId = req.cookies.get("session")?.value;
 
     if (!userId) {
       return NextResponse.json({ message: "Belum login" }, { status: 401 });
@@ -34,14 +34,24 @@ export async function PUT(req: NextRequest) {
 
     const { email, password, phone, address } = await req.json();
 
-    await sql`
-      UPDATE users SET
-        email    = ${email},
-        password = ${password},
-        phone    = ${phone},
-        address  = ${address}
-      WHERE id = ${userId}
-    `;
+    if (password && password.trim() !== "") {
+      await sql`
+        UPDATE users SET
+          email   = ${email},
+          password = ${password},
+          phone   = ${phone},
+          address = ${address}
+        WHERE id = ${userId}
+      `;
+    } else {
+      await sql`
+        UPDATE users SET
+          email   = ${email},
+          phone   = ${phone},
+          address = ${address}
+        WHERE id = ${userId}
+      `;
+    }
 
     return NextResponse.json({ success: true, message: "Profil berhasil diperbarui" });
   } catch (error) {

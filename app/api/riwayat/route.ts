@@ -4,10 +4,15 @@ export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.cookies.get("user_id")?.value;
+    const userId = req.cookies.get("session")?.value; // ✅ ganti ke "session"
 
     if (!userId) {
       return NextResponse.json({ message: "Belum login" }, { status: 401 });
+    }
+
+    // Pastikan userId bukan "admin" (admin tidak punya riwayat pemesanan)
+    if (userId === "admin") {
+      return NextResponse.json({ message: "Akses ditolak" }, { status: 403 });
     }
 
     const data = await sql`

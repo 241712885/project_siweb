@@ -21,27 +21,43 @@ export default function ProfilePage() {
     address: "",
   });
 
-  // Ambil data profil saat halaman dibuka
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const res = await fetch("/api/profile");
-        const json = await res.json();
-        if (res.ok && json.success) {
-          setForm({
-            nama:     json.data.nama     ?? "",
-            email:    json.data.email    ?? "",
-            password: "",
-            phone:    json.data.phone    ?? "",
-            address:  json.data.address  ?? "",
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+  const [savedForm, setSavedForm] = useState({
+    nama: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+
+  const hasChanges =
+    form.email !== savedForm.email ||
+    form.phone !== savedForm.phone ||
+    form.address !== savedForm.address ||
+    form.password.trim() !== "";
+  
+  const fetchProfile = async () => {
+  try {
+    const res = await fetch("/api/profile");
+    const json = await res.json();
+
+    if (res.ok && json.success) {
+      const data = {
+        nama: json.data.nama ?? "",
+        email: json.data.email ?? "",
+        phone: json.data.phone ?? "",
+        address: json.data.address ?? "",
+      };
+
+      setForm({ ...data, password: "" });
+      setSavedForm(data);
     }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  useEffect(() => {
     fetchProfile();
   }, []);
 
@@ -49,35 +65,56 @@ export default function ProfilePage() {
     const { name, value } = e.target;
     if (name === "phone" && !/^\d*$/.test(value)) return;
     setForm({ ...form, [name]: value });
+    // [TAMBAH] Hapus error field saat user mulai mengetik
+    setErrors((prev: any) => ({ ...prev, [name]: "" }));
+  };
+
+  // [TAMBAH] Fungsi validasi email lengkap (harus ada @ dan .com)
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.toLowerCase().includes(".com");
   };
 
   const validate = () => {
     const newErrors: any = {};
 
-    // Email
+    // [UBAH] Validasi email lengkap dengan .com
     if (!form.email.trim()) {
       newErrors.email = "Email wajib diisi";
     } else if (!form.email.includes("@")) {
-      newErrors.email = "Format email salah, harus menggunakan (@)";
+      newErrors.email = "Email tidak valid (harus ada @)";
+    } else if (!isValidEmail(form.email)) {
+      newErrors.email = "Email tidak valid (harus ada .com)";
     }
 
-    // Password
-    if (form.password.length > 0 && form.password.length < 8) {
-      newErrors.password = "Password minimal 8 karakter";
+    // [UBAH] Validasi password lebih spesifik
+    if (form.password.length > 0) {
+      if (form.password.length < 8) {
+        newErrors.password = "Password minimal 8 karakter";
+      } else if (!/[A-Z]/.test(form.password) && !/[0-9]/.test(form.password)) {
+        newErrors.password = "Password terlalu lemah, tambahkan angka atau huruf kapital";
+      }
     }
 
-    // Nomor Telepon
+    // [UBAH] Validasi nomor telepon lebih spesifik
     if (!form.phone.trim()) {
       newErrors.phone = "Nomor telepon wajib diisi";
+    } else if (!/^\d+$/.test(form.phone)) {
+      newErrors.phone = "Nomor telepon hanya boleh berisi angka";
     } else if (form.phone.length < 10) {
       newErrors.phone = "Nomor telepon minimal 10 digit";
+    } else if (form.phone.length > 15) {
+      newErrors.phone = "Nomor telepon maksimal 15 digit";
+    } else if (!form.phone.startsWith("08") && !form.phone.startsWith("62")) {
+      newErrors.phone = "Nomor telepon harus diawali 08 atau 62";
     }
 
-    // Alamat
+    // [UBAH] Validasi alamat lebih spesifik
     if (!form.address.trim()) {
       newErrors.address = "Alamat wajib diisi";
     } else if (form.address.trim().length < 15) {
-      newErrors.address = "Alamat minimal 15 karakter";
+      newErrors.address = "Alamat terlalu pendek (minimal 15 karakter)";
+    } else if (form.address.trim().length > 200) {
+      newErrors.address = "Alamat terlalu panjang (maksimal 200 karakter)";
     }
 
     setErrors(newErrors);
@@ -101,15 +138,24 @@ export default function ProfilePage() {
       });
 
       const json = await res.json();
+
       if (res.ok && json.success) {
         setSuccess("Perubahan profil berhasil disimpan");
         setForm({ ...form, password: "" });
         setTimeout(() => setSuccess(""), 3000);
+        await fetchProfile();
       } else {
-        setErrors({ submit: json.message ?? "Gagal menyimpan perubahan" });
+        // [UBAH] Error handling spesifik dari server
+        if (res.status === 409) {
+          setErrors({ email: "Email sudah digunakan akun lain" });
+        } else if (res.status === 400) {
+          setErrors({ submit: json.message ?? "Data yang dimasukkan tidak valid" });
+        } else {
+          setErrors({ submit: json.message ?? "Gagal menyimpan perubahan" });
+        }
       }
     } catch (e) {
-      setErrors({ submit: "Tidak dapat terhubung ke server" });
+      setErrors({ submit: "Tidak dapat terhubung ke server. Coba lagi." });
     } finally {
       setSaving(false);
     }
@@ -119,7 +165,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-b from-[#E8FDF5] to-gray-100">
       {success && (
         <div className="fixed top-5 right-5 z-[60] bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg text-sm font-medium">
-          {success}
+          ✓ {success}
         </div>
       )}
 
@@ -172,61 +218,111 @@ export default function ProfilePage() {
               <p className="text-gray-400 text-sm text-center py-6">Memuat data profil...</p>
             ) : (
               <>
-                {errors.submit && <p className="text-red-500 text-sm mb-3">{errors.submit}</p>}
+                {errors.submit && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
+                    {errors.submit}
+                  </div>
+                )}
 
+                {/* Nama — tidak bisa diubah */}
                 <div className="mb-4">
-                  <label>Nama</label>
-                  <input value={form.nama} disabled className="w-full px-4 py-2 border rounded-lg mt-1 bg-gray-50 text-gray-500 cursor-not-allowed" />
+                  <label className="text-sm font-medium text-gray-700">Nama</label>
+                  <input
+                    value={form.nama}
+                    disabled
+                    className="w-full px-4 py-2 border rounded-lg mt-1 bg-gray-50 text-gray-400 cursor-not-allowed text-sm"
+                  />
+                  <p className="text-gray-400 text-xs mt-1">Nama tidak dapat diubah</p>
                 </div>
 
+                {/* Email */}
                 <div className="mb-4">
-                  <label>Email</label>
-                  <input name="email" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
-                  <p className="text-red-500 text-sm">{errors.email}</p>
+                  <label className="text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="contoh@email.com"
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg mt-1 text-sm`}
+                  />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">⚠ {errors.email}</p>}
                 </div>
 
+                {/* Password */}
                 <div className="mb-4">
-                  <label>Password Baru <span className="text-gray-400 text-xs">(kosongkan jika tidak ingin mengubah)</span></label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Password Baru{" "}
+                    <span className="text-gray-400 text-xs font-normal">(kosongkan jika tidak ingin mengubah)</span>
+                  </label>
                   <div className="relative mt-1">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={form.password}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-lg pr-12"
+                      placeholder="Minimal 8 karakter"
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg pr-12 text-sm`}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <p className="text-red-500 text-sm">{errors.password}</p>
+                  {errors.password && <p className="text-red-500 text-xs mt-1">⚠ {errors.password}</p>}
                 </div>
 
+                {/* Nomor Telepon */}
                 <div className="mb-4">
-                  <label>Nomor Telepon</label>
-                  <input name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
-                  <p className="text-red-500 text-sm">{errors.phone}</p>
+                  <label className="text-sm font-medium text-gray-700">Nomor Telepon</label>
+                  <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="08xxxxxxxxxx"
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg mt-1 text-sm`}
+                  />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">⚠ {errors.phone}</p>}
                 </div>
 
+                {/* Alamat */}
                 <div className="mb-4">
-                  <label>Alamat</label>
-                  <input name="address" value={form.address} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg mt-1" />
-                  <p className="text-red-500 text-sm">{errors.address}</p>
+                  <label className="text-sm font-medium text-gray-700">Alamat</label>
+                  <input
+                    name="address"
+                    value={form.address}
+                    onChange={handleChange}
+                    placeholder="Jl. Contoh No. 1, Kota"
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg mt-1 text-sm`}
+                  />
+                  {errors.address && <p className="text-red-500 text-xs mt-1">⚠ {errors.address}</p>}
+                  {/* [TAMBAH] Karakter counter */}
+                  <p className="text-gray-400 text-xs mt-1 text-right">{form.address.length}/200</p>
                 </div>
 
                 <button
                   onClick={handleSubmit}
-                  disabled={saving}
-                  className="bg-green-600 text-white w-full py-3 rounded-lg mt-3 hover:bg-green-700 transition-all duration-200 disabled:opacity-60"
+                  disabled={saving || !hasChanges}
+                  className="bg-green-600 text-white w-full py-3 rounded-lg mt-3 hover:bg-green-700 transition-all duration-200 disabled:opacity-60 font-semibold text-sm"
                 >
                   {saving ? "Menyimpan..." : "Simpan Perubahan"}
                 </button>
+                {!saving && !hasChanges && (
+                  <p className="text-gray-400 text-xs mt-2 text-center">Ubah salah satu field untuk mengaktifkan tombol simpan</p>
+                )}
               </>
             )}
           </div>
 
           <div className="max-w-xl w-full mt-6 flex flex-col gap-3">
-            <button onClick={() => router.push("/keluar")} className="border border-red-600 text-red-700 py-3 rounded-lg hover:bg-red-100 transition-all duration-200">Keluar</button>
+            <button
+              onClick={() => router.push("/keluar")}
+              className="border border-red-600 text-red-700 py-3 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-medium"
+            >
+              Keluar
+            </button>
           </div>
         </div>
       </div>
