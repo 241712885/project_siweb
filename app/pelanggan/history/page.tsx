@@ -100,7 +100,7 @@ export default function Page() {
                         }}
                         className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                     >
-                        Beranda
+                        🏠 Beranda
                     </button>
 
                     <button
@@ -110,7 +110,7 @@ export default function Page() {
                         }}
                         className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
                     >
-                        Riwayat
+                        🕒 Riwayat
                     </button>
 
                     <button
@@ -120,7 +120,7 @@ export default function Page() {
                         }}
                         className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                     >
-                        Profil
+                        🧑‍💼 Profil
                     </button>
                 </div>
                 <button 

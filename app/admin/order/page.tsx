@@ -102,6 +102,8 @@ export default function OrderManagement() {
 
     if (!form.senderAddress.trim()) {
       error.senderAddress = "Alamat pengirim wajib diisi";
+    } else if (form.senderAddress.split(",").length < 10) {
+      error.senderAddress = "Alamat minimal 10 karakter";
     } else if (form.senderAddress.split(",").length < 3) {
       error.senderAddress =
         "Format: Nama Jalan, Kota, Provinsi (contoh: Jl. Sudirman No.5, Jakarta, DKI Jakarta)";
@@ -116,6 +118,8 @@ export default function OrderManagement() {
 
     if (!form.receiverAddress.trim()) {
       error.receiverAddress = "Alamat penerima wajib diisi";
+    } else if (form.receiverAddress.split(",").length < 10) {
+      error.receiverAddress = "Alamat minimal 10 karakter";
     } else if (form.receiverAddress.split(",").length < 3) {
       error.receiverAddress =
         "Format: Nama Jalan, Kota, Provinsi (contoh: Jl. Sudirman No.5, Jakarta, DKI Jakarta)";
@@ -311,7 +315,7 @@ export default function OrderManagement() {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Beranda
+              🏠 Beranda
             </button>
             <button
               onClick={() => {
@@ -320,7 +324,7 @@ export default function OrderManagement() {
               }}
               className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
             >
-              Pemesanan
+              📋 Pemesanan
             </button>
             <button
               onClick={() => {
@@ -329,7 +333,7 @@ export default function OrderManagement() {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Pengiriman
+              📦 Pengiriman
             </button>
             <button
               onClick={() => {
@@ -338,7 +342,7 @@ export default function OrderManagement() {
               }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
             >
-              Armada
+              🚚 Armada
             </button>
           </div>
 

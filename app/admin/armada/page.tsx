@@ -296,10 +296,10 @@ export default function ArmadaPage() {
           </div>
           <div className="space-y-2 flex-1">
             {[
-              { label: "Beranda",    path: "/admin/beranda" },
-              { label: "Pemesanan", path: "/admin/order" },
-              { label: "Pengiriman",path: "/admin/pengiriman" },
-              { label: "Armada",    path: "/admin/armada" },
+              { label: "🏠 Beranda",    path: "/admin/beranda" },
+              { label: "📋 Pemesanan", path: "/admin/order" },
+              { label: "📦 Pengiriman",path: "/admin/pengiriman" },
+              { label: "🚚 Armada",    path: "/admin/armada" },
             ].map((item) => (
               <button
                 key={item.path}

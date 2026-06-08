@@ -183,9 +183,9 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className="space-y-2 flex-1">
-            <button onClick={() => { router.push("/pelanggan/dashboard"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">Beranda</button>
-            <button onClick={() => { router.push("/pelanggan/history"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">Riwayat</button>
-            <button onClick={() => { router.push("/pelanggan/profile"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">Profil</button>
+            <button onClick={() => { router.push("/pelanggan/dashboard"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">🏠 Beranda</button>
+            <button onClick={() => { router.push("/pelanggan/history"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">🕒 Riwayat</button>
+            <button onClick={() => { router.push("/pelanggan/profile"); setOpen(false); }} className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">🧑‍💼 Profil</button>
           </div>
           <button onClick={() => router.push("/keluar")} className="w-full text-left px-4 py-2 text-red-500 text-base font-semibold mt-auto mb-20">Keluar</button>
         </div>

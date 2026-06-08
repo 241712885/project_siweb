@@ -130,10 +130,12 @@ export default function AdminPengirimanPage() {
       const matchStatus =
         status === "Semua Status" ? true : item.status === status;
 
-      const itemDate = new Date(item.date).getTime();
-      const start = startDate ? new Date(startDate).getTime() : -Infinity;
-      const end = endDate ? new Date(endDate).getTime() : Infinity;
-      const matchDate = itemDate >= start && itemDate <= end;
+      const itemLocal = new Date(item.date);
+      const itemDateOnly = `${itemLocal.getFullYear()}-${String(itemLocal.getMonth() + 1).padStart(2, "0")}-${String(itemLocal.getDate()).padStart(2, "0")}`;
+
+      const matchDate =
+        (!startDate || itemDateOnly >= startDate) &&
+        (!endDate || itemDateOnly <= endDate);
 
       return matchSearch && matchStatus && matchDate;
     });
@@ -187,7 +189,7 @@ export default function AdminPengirimanPage() {
                     }}
                     className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                 >
-                    Beranda
+                    🏠 Beranda
                 </button>
 
                 <button
@@ -197,7 +199,7 @@ export default function AdminPengirimanPage() {
                     }}
                     className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                 >
-                    Pemesanan
+                    📋 Pemesanan
                 </button>
 
                 <button
@@ -207,7 +209,7 @@ export default function AdminPengirimanPage() {
                     }}
                     className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium"
                 >
-                    Pengiriman
+                    📦 Pengiriman
                 </button>
 
                 <button
@@ -217,7 +219,7 @@ export default function AdminPengirimanPage() {
                     }}
                     className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
                   >
-                    Armada
+                    🚚 Armada
                 </button>
             </div>
 

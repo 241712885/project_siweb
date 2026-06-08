@@ -123,19 +123,19 @@ export default function AdminDashboard() {
           <div className="space-y-2 flex-1">
             <button onClick={() => { router.push("/admin/beranda"); setOpen(false); }}
               className="w-full text-left px-4 py-2 rounded-lg bg-green-600 text-white font-medium">
-              Beranda
+              🏠 Beranda
             </button>
             <button onClick={() => { router.push("/admin/order"); setOpen(false); }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              Pemesanan
+              📋 Pemesanan
             </button>
             <button onClick={() => { router.push("/admin/pengiriman"); setOpen(false); }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              Pengiriman
+              📦 Pengiriman
             </button>
             <button onClick={() => { router.push("/admin/armada"); setOpen(false); }}
               className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-              Armada
+              🚚 Armada
             </button>
           </div>
 
