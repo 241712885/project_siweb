@@ -118,6 +118,8 @@ export default function AdminPengirimanPage() {
   }, []);
 
   const filteredShipments = useMemo(() => {
+    if (!startDate || !endDate) return [];
+
     return shipments.filter((item) => {
       const keyword = search.toLowerCase();
 
@@ -407,7 +409,9 @@ export default function AdminPengirimanPage() {
                           colSpan={6}
                           className="px-6 py-8 text-center text-sm text-slate-500"
                         >
-                          Tidak ada data pengiriman yang cocok.
+                          {!startDate || !endDate
+                            ? "Pilih tanggal mulai dan tanggal selesai untuk menampilkan data."
+                            : "Tidak ada data pengiriman yang cocok."}
                         </td>
                       </tr>
                     )}

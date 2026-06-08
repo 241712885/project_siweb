@@ -8,14 +8,25 @@ const PUBLIC_PATHS = [
   "/unauthorized",
 ];
 
+const ADMIN_PATHS = [
+  "/admin/armada",
+  "/admin/beranda",
+  "/admin/order",
+  "/admin/order/transfer",
+  "/admin/pengiriman",
+];
+
+const PELANGGAN_PATHS = [
+  "/pelanggan/dashboard",
+  "/pelanggan/history",
+  "/pelanggan/profile",
+  "/pelanggan/tracking",
+];
+
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isPublic = PUBLIC_PATHS.some((path) =>
-    path === "/" ? pathname === "/" : pathname.startsWith(path)
-  );
-  if (isPublic) return NextResponse.next();
-
+  // static assets & API bebas
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -25,13 +36,35 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = request.cookies.get("session");
+  // public path bebas diakses
+  const isPublic = PUBLIC_PATHS.some((path) => pathname === path);
+  if (isPublic) return NextResponse.next();
 
+  const session = request.cookies.get("session");
+  const userRole = request.cookies.get("user_role");
+
+  // belum login → redirect ke login
   if (!session || !session.value) {
-    const unauthorizedUrl = new URL("/unauthorized", request.url);
-    return NextResponse.redirect(unauthorizedUrl);
+    return NextResponse.redirect(new URL("/login-regist/login", request.url));
   }
 
+  const role = userRole?.value;
+
+  // admin mencoba akses halaman pelanggan
+  const isPelangganPath = PELANGGAN_PATHS.some((path) =>
+    pathname.startsWith(path)
+  );
+  if (isPelangganPath && role !== "pelanggan") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  // pelanggan mencoba akses halaman admin
+  const isAdminPath = ADMIN_PATHS.some((path) => pathname.startsWith(path));
+  if (isAdminPath && role !== "admin") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  // /keluar hanya bisa diakses kalau sudah login (sudah lolos cek session di atas)
   return NextResponse.next();
 }
 
