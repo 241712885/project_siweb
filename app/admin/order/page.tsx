@@ -102,7 +102,7 @@ export default function OrderManagement() {
 
     if (!form.senderAddress.trim()) {
       error.senderAddress = "Alamat pengirim wajib diisi";
-    } else if (form.senderAddress.split(",").length < 10) {
+    } else if (form.senderAddress.trim().length < 10) {
       error.senderAddress = "Alamat minimal 10 karakter";
     } else if (form.senderAddress.split(",").length < 3) {
       error.senderAddress =
