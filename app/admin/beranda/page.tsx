@@ -244,30 +244,15 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-
-                <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
-                  <h3 className="font-semibold mb-6 text-sm sm:text-base flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-green-600" />
-                    Status Pengiriman
-                  </h3>
-                  <div className="flex items-end gap-6 sm:gap-10 h-40">
-                    <Bar label="Gudang"  value={gudang}   maxVal={maxVal} color="bg-yellow-400" />
-                    <Bar label="Proses"  value={proses}   maxVal={maxVal} color="bg-blue-400" />
-                    <Bar label="Selesai" value={terkirim} maxVal={maxVal} color="bg-green-500" />
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
                     <PieChart className="w-4 h-4 text-green-600" />
-                    Proporsi Status Pesanan
+                    Status Pesanan
                   </h3>
                   <DonutChart data={donutData} total={donutTotal} />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+             
 
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
                   <h3 className="font-semibold mb-6 text-sm sm:text-base flex items-center gap-2">
@@ -278,49 +263,6 @@ export default function AdminDashboard() {
                     <BarMoney label="Tunai"    value={pendapatanTunai}    maxVal={maxPendapatan} color="bg-emerald-500" />
                     <BarMoney label="Transfer" value={pendapatanTransfer} maxVal={maxPendapatan} color="bg-purple-500" />
                   </div>
-                </div>
-
-                <div className="bg-white p-4 sm:p-6 rounded-xl shadow">
-                  <h3 className="font-semibold mb-4 text-sm sm:text-base flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-blue-500" />
-                    Tren Pesanan Harian
-                  </h3>
-                  {trendDays.length === 0 ? (
-                    <p className="text-gray-400 text-sm text-center py-10">Tidak ada data</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <div className="flex items-end gap-2 h-40 min-w-max px-1">
-                        {trendDays.map((day) => {
-                          const { total: t, selesai: s } = trendMap[day];
-                          const heightTotal   = Math.max((t / trendMax) * 120, t > 0 ? 6 : 0);
-                          const heightSelesai = Math.max((s / trendMax) * 120, s > 0 ? 4 : 0);
-                          const label = day.slice(5); 
-                          return (
-                            <div key={day} className="flex flex-col items-center gap-0.5 group relative">
-                              <div className="absolute bottom-full mb-1 hidden group-hover:flex flex-col items-center z-10">
-                                <div className="bg-gray-800 text-white text-[10px] rounded px-2 py-1 whitespace-nowrap">
-                                  {day}<br/>Total: {t} | Selesai: {s}
-                                </div>
-                              </div>
-                              <span className="text-[10px] text-gray-500 font-semibold">{t}</span>
-                              <div className="relative flex items-end" style={{ height: `${heightTotal}px`, width: "20px" }}>
-                                <div className="absolute inset-0 bg-blue-300 rounded-t" />
-                                <div
-                                  className="absolute bottom-0 left-0 right-0 bg-green-500 rounded-t"
-                                  style={{ height: `${heightSelesai}px` }}
-                                />
-                              </div>
-                              <span className="text-[9px] text-gray-400 mt-0.5">{label}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-blue-300 inline-block" />Total</span>
-                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-green-500 inline-block" />Selesai</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 

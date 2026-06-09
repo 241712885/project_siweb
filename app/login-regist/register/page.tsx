@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -20,10 +20,24 @@ export default function RegisterPage() {
   const [error, setError] = useState<any>({});
   const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
-  const captchaCode = "xDM72w";
+  const [captchaCode, setCaptchaCode] = useState("");
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.toLowerCase().includes(".com");
   };
+
+  const generateCaptcha = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < 6; i++) {
+      result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    setCaptchaCode(result);
+  };
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -71,7 +85,11 @@ export default function RegisterPage() {
 
     setError(newError);
 
-    if (Object.keys(newError).length > 0) return;
+    if (Object.keys(newError).length > 0) {
+      generateCaptcha();
+      setForm({ ...form, captcha: "" });
+      return;
+    }
 
     try {
       setLoading(true);
@@ -209,6 +227,7 @@ export default function RegisterPage() {
             <label>Captcha</label>
             <div className="captcha-box">{captchaCode}</div>
             <input
+              value={form.captcha}
               placeholder="Masukkan captcha"
               onChange={(e) => {
                 setForm({ ...form, captcha: e.target.value });

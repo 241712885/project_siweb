@@ -23,7 +23,7 @@ const PELANGGAN_PATHS = [
   "/pelanggan/tracking",
 ];
 
-export default function proxy(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // static assets & API bebas
@@ -45,7 +45,7 @@ export default function proxy(request: NextRequest) {
 
   // belum login → redirect ke login
   if (!session || !session.value) {
-    return NextResponse.redirect(new URL("/login-regist/login", request.url));
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
   const role = userRole?.value;
