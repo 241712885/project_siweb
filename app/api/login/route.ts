@@ -21,7 +21,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Login admin
-    if (email === ADMIN.email && password === ADMIN.password) {
+    if (email === ADMIN.email) {
+      if (password !== ADMIN.password) {
+        return NextResponse.json(
+          { message: "Password salah" },
+          { status: 401 }
+        );
+      }
+      
       const response = NextResponse.json({
         message: "Login berhasil",
         role: "admin",

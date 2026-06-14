@@ -61,6 +61,8 @@ export default function RegisterPage() {
       newError.phone = "Nomor Telepon tidak boleh kosong";
     } else if (form.phone.length < 10) {
       newError.phone = "Nomor telepon minimal 10 digit";
+    } else if (form.phone.length > 15) {
+      newError.phone = "Nomor telepon maksimal 15 digit";
     }
 
     if (!form.address) newError.address = "Alamat tidak boleh kosong";
@@ -136,14 +138,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="container">
-      <div className="card">
+    <div className="min-h-screen bg-[#2BAB6F] flex justify-center items-start px-4 py-5">
+      <div className="w-full max-w-[300px] bg-[#EDEDED] rounded-2xl p-4">
 
-        <h2>Register</h2>
+        <h2 className="text-center text-[15px] font-semibold mb-1.5 text-gray-900">Register</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label>Username</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Username</label>
             <input
               value={form.username}
               placeholder="Masukkan username"
@@ -151,12 +153,13 @@ export default function RegisterPage() {
                 setForm({ ...form, username: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.username}</span>
+            <span className="text-red-600 text-[8px]">{error.username}</span>
           </div>
 
-          <div className="field">
-            <label>Email</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Email</label>
             <input
               value={form.email}
               placeholder="Masukkan email"
@@ -164,12 +167,13 @@ export default function RegisterPage() {
                 setForm({ ...form, email: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.email}</span>
+            <span className="text-red-600 text-[8px]">{error.email}</span>
           </div>
 
-          <div className="field">
-            <label>Nomor Telepon</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Nomor Telepon</label>
             <input
               value={form.phone}
               placeholder="Masukkan nomor telepon"
@@ -178,12 +182,13 @@ export default function RegisterPage() {
                 setForm({ ...form, phone: onlyNumber });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.phone}</span>
+            <span className="text-red-600 text-[8px]">{error.phone}</span>
           </div>
 
-          <div className="field">
-            <label>Alamat</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Alamat</label>
             <input
               value={form.address}
               placeholder="Masukkan alamat"
@@ -191,12 +196,13 @@ export default function RegisterPage() {
                 setForm({ ...form, address: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.address}</span>
+            <span className="text-red-600 text-[8px]">{error.address}</span>
           </div>
 
-          <div className="field">
-            <label>Password</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Password</label>
             <input
               type="password"
               value={form.password}
@@ -205,12 +211,13 @@ export default function RegisterPage() {
                 setForm({ ...form, password: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.password}</span>
+            <span className="text-red-600 text-[8px]">{error.password}</span>
           </div>
 
-          <div className="field">
-            <label>Konfirmasi Password</label>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700">Konfirmasi Password</label>
             <input
               type="password"
               value={form.confirmPassword}
@@ -219,13 +226,20 @@ export default function RegisterPage() {
                 setForm({ ...form, confirmPassword: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.confirmPassword}</span>
+            <span className="text-red-600 text-[8px]">{error.confirmPassword}</span>
           </div>
 
-          <div className="field">
-            <label>Captcha</label>
-            <div className="captcha-box">{captchaCode}</div>
+          <div className="mb-[5px]">
+            <label className="text-[10px] text-gray-700 block">
+              Captcha
+            </label>
+
+            <div className="bg-gray-300 px-1.5 py-0.5 rounded-md text-[9px] mb-1 inline-block tracking-[2px] font-bold">
+              {captchaCode}
+            </div>
+
             <input
               value={form.captcha}
               placeholder="Masukkan captcha"
@@ -233,126 +247,36 @@ export default function RegisterPage() {
                 setForm({ ...form, captcha: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-1.5 py-1.5 rounded-lg border border-gray-300 text-[10px] box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.captcha}</span>
-          </div>
 
+            <span className="text-red-600 text-[8px] block">
+              {error.captcha}
+            </span>
+          </div>
+          
           {globalError && (
-            <div className="global-error">{globalError}</div>
+            <div className="bg-red-100 text-red-600 px-1.5 py-1.5 rounded-lg text-[9px] mt-1">
+              {globalError}
+            </div>
           )}
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-1.5 bg-[#2BAB6F] text-white border-none rounded-full mt-1.5 cursor-pointer text-xs disabled:bg-gray-500 disabled:cursor-not-allowed"
+          >
             {loading ? "Memproses..." : "Register"}
           </button>
 
-          <p className="footer">
+          <p className="text-[9px] text-center mt-1.5 text-gray-700">
             Sudah punya akun?{" "}
-            <Link href="/login-regist/login" className="link">
+            <Link href="/login-regist/login" className="text-[#2BAB6F] font-semibold">
               Sign In
             </Link>
           </p>
         </form>
       </div>
-
-      <style jsx global>{`
-        * { font-family: 'Poppins', sans-serif; }
-        body { margin: 0; }
-      `}</style>
-
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          overflow-y: auto;
-          background: #2BAB6F;
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-          padding: 20px 0;
-        }
-
-        .card {
-          width: 300px;
-          background: #EDEDED;
-          padding: 16px;
-          border-radius: 16px;
-        }
-
-        h2 {
-          text-align: center;
-          font-size: 15px;
-          margin-bottom: 6px;
-        }
-
-        .field {
-          margin-bottom: 5px;
-        }
-
-        label {
-          font-size: 10px;
-        }
-
-        input {
-          width: 100%;
-          padding: 6px;
-          border-radius: 8px;
-          border: 1px solid #ccc;
-          font-size: 10px;
-          box-sizing: border-box;
-        }
-
-        .captcha-box {
-          background: #ddd;
-          padding: 2px 6px;
-          border-radius: 6px;
-          font-size: 9px;
-          margin: 2px 0;
-          display: inline-block;
-          letter-spacing: 2px;
-          font-weight: bold;
-        }
-
-        button {
-          width: 100%;
-          padding: 7px;
-          background: #2BAB6F;
-          color: white;
-          border: none;
-          border-radius: 18px;
-          margin-top: 5px;
-          cursor: pointer;
-          font-size: 12px;
-        }
-
-        button:disabled {
-          background: gray;
-          cursor: not-allowed;
-        }
-
-        .error {
-          color: red;
-          font-size: 8px;
-        }
-
-        .global-error {
-          background: #ffe5e5;
-          color: red;
-          padding: 6px;
-          border-radius: 8px;
-          font-size: 9px;
-          margin-top: 4px;
-        }
-
-        .footer {
-          font-size: 9px;
-          text-align: center;
-          margin-top: 5px;
-        }
-
-        .link {
-          color: #2BAB6F;
-          font-weight: 500;
-        }
-      `}</style>
     </div>
   );
 }

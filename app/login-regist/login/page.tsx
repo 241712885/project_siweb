@@ -147,10 +147,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container">
-      <div className="card">
+    <div className="min-h-screen bg-[#2BAB6F] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-[330px] bg-[#EDEDED] rounded-2xl p-5 text-center">
 
-        <div className="logo">
+        <div className="w-[70px] h-[70px] bg-[#2BAB6F] rounded-full flex items-center justify-center mx-auto mb-2.5 overflow-hidden">
           <Image
             src="/LogoPaketinAja.jpeg"
             alt="logo"
@@ -161,12 +161,12 @@ export default function LoginPage() {
           />
         </div>
 
-        <h2>Welcome to PaketinAja</h2>
-        <p className="subtitle">Sign in to continue</p>
+        <h2 className="text-base font-semibold my-1 text-gray-900">Welcome to PaketinAja</h2>
+        <p className="text-xs text-gray-600 mb-2.5">Sign in to continue</p>
 
         <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label>Email</label>
+          <div className="text-left mb-2">
+            <label className="text-xs text-gray-700">Email</label>
             <input
               placeholder="Masukkan email"
               value={form.email}
@@ -174,12 +174,13 @@ export default function LoginPage() {
                 setForm({ ...form, email: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-2 py-2 mt-[3px] rounded-lg border border-gray-300 text-xs box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.email}</span>
+            <span className="text-red-600 text-[10px]">{error.email}</span>
           </div>
 
-          <div className="field">
-            <label>Password</label>
+          <div className="text-left mb-2">
+            <label className="text-xs text-gray-700">Password</label>
             <input
               type="password"
               placeholder="Masukkan password"
@@ -188,14 +189,17 @@ export default function LoginPage() {
                 setForm({ ...form, password: e.target.value });
                 setGlobalError("");
               }}
+              className="w-full px-2 py-2 mt-[3px] rounded-lg border border-gray-300 text-xs box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.password}</span>
+            <span className="text-red-600 text-[10px]">{error.password}</span>
           </div>
 
-          <div className="field">
-            <label>Captcha</label>
+          <div className="text-left mb-2">
+            <label className="text-xs text-gray-700">Captcha</label>
             <div>
-              <span className="captcha-code">{captcha}</span>
+              <span className="inline-block bg-gray-300 px-2 py-1 rounded-md text-[10px] tracking-[3px] font-bold mb-[3px]">
+                {captcha}
+              </span>
             </div>
             <input
               placeholder="Masukkan captcha"
@@ -204,39 +208,49 @@ export default function LoginPage() {
                 setInputCaptcha(e.target.value);
                 setGlobalError("");
               }}
+              className="w-full px-2 py-2 mt-[3px] rounded-lg border border-gray-300 text-xs box-border focus:outline-none focus:ring-2 focus:ring-[#2BAB6F]"
             />
-            <span className="error">{error.captcha}</span>
+            <span className="text-red-600 text-[10px]">{error.captcha}</span>
           </div>
 
           {globalError && (
-            <div className="global-error">{globalError}</div>
+            <div className="bg-red-100 text-red-600 px-1.5 py-1.5 rounded-lg text-[10px] mt-1.5">
+              {globalError}
+            </div>
           )}
 
-          <p className="attempt">
+          <p className="text-[10px] mt-1.5 text-gray-700">
             Sisa percobaan: {3 - attempt}
           </p>
 
           {attempt >= 3 && (
-            <div className="limit-box">
+            <div className="bg-red-100 text-red-600 px-2 py-2 rounded-lg text-[10px] mt-2">
               <p>Terlalu banyak percobaan. Silakan reset.</p>
-              <button type="button" onClick={resetAttempt}>
+              <button
+                type="button"
+                onClick={resetAttempt}
+                className="w-full py-2.5 bg-[#f4a742] text-white border-none rounded-full mt-1.5 cursor-pointer text-[13px]"
+              >
                 Reset Kesempatan
               </button>
             </div>
           )}
 
-          <button type="submit" disabled={attempt >= 3 || loading}>
+          <button
+            type="submit"
+            disabled={attempt >= 3 || loading}
+            className="w-full py-2.5 bg-[#2BAB6F] text-white border-none rounded-full mt-2 cursor-pointer text-[13px] disabled:bg-gray-500 disabled:cursor-not-allowed"
+          >
             {loading ? "Memproses..." : "Sign in"}
           </button>
 
         </form>
 
-        <div className="footer">
-          <p>Forgot Password?</p>
+        <div className="text-[10px] mt-2 text-gray-700">
           <p>
             Need an account?{" "}
             <span
-              className="link"
+              className="text-[#2BAB6F] font-medium cursor-pointer"
               onClick={() => router.push("/login-regist/register")}
             >
               Register
@@ -245,131 +259,6 @@ export default function LoginPage() {
         </div>
 
       </div>
-
-      <style jsx global>{`
-        * {
-          font-family: 'Poppins', sans-serif;
-        }
-        body {
-          margin: 0;
-        }
-      `}</style>
-
-      <style jsx>{`
-        .container {
-          height: 100vh;
-          overflow-y: auto;
-          background: #2BAB6F;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .card {
-          width: 330px;
-          background: #EDEDED;
-          padding: 20px;
-          border-radius: 16px;
-          text-align: center;
-        }
-        .logo {
-          width: 70px;
-          height: 70px;
-          background: #2BAB6F;
-          border-radius: 50%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin: auto;
-          margin-bottom: 10px;
-          overflow: hidden;
-        }
-        h2 {
-          font-size: 16px;
-          margin: 5px 0;
-        }
-        .subtitle {
-          font-size: 12px;
-          margin-bottom: 10px;
-        }
-        .field {
-          text-align: left;
-          margin-bottom: 8px;
-        }
-        label {
-          font-size: 12px;
-        }
-        input {
-          width: 100%;
-          padding: 8px;
-          border-radius: 8px;
-          border: 1px solid #ccc;
-          margin-top: 3px;
-          font-size: 12px;
-          box-sizing: border-box;
-        }
-        .captcha-code {
-          background: #ddd;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 10px;
-          display: inline-block;
-          margin-bottom: 3px;
-          letter-spacing: 3px;
-          font-weight: bold;
-        }
-        button {
-          width: 100%;
-          padding: 10px;
-          background: #2BAB6F;
-          color: white;
-          border: none;
-          border-radius: 20px;
-          margin-top: 8px;
-          cursor: pointer;
-          font-size: 13px;
-        }
-        button:disabled {
-          background: gray;
-          cursor: not-allowed;
-        }
-        .error {
-          color: red;
-          font-size: 10px;
-        }
-        .global-error {
-          background: #ffe5e5;
-          color: red;
-          padding: 6px;
-          border-radius: 8px;
-          font-size: 10px;
-          margin-top: 6px;
-        }
-        .attempt {
-          font-size: 10px;
-          margin-top: 5px;
-        }
-        .limit-box {
-          background: #ffe5e5;
-          color: red;
-          padding: 8px;
-          border-radius: 8px;
-          font-size: 10px;
-          margin-top: 8px;
-        }
-        .limit-box button {
-          background: #f4a742;
-          margin-top: 5px;
-        }
-        .footer {
-          font-size: 10px;
-          margin-top: 8px;
-        }
-        .link {
-          color: #2BAB6F;
-          font-weight: 500;
-          cursor: pointer;
-        }
-      `}</style>
     </div>
   );
 }

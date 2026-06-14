@@ -44,6 +44,7 @@ const emptyDriver = {
 };
 
 const PLAT_REGEX = /^[A-Z]{1,3}\s\d{1,4}\s[A-Z]{1,3}$/;
+const SIM_REGEX = /^SIM-\d{3}-\d{4}$/;
 
 export default function ArmadaPage() {
   const [open, setOpen]   = useState(false);
@@ -151,6 +152,8 @@ export default function ArmadaPage() {
 
     if (!formD.no_sim.trim()) {
       e.no_sim = "Wajib diisi";
+    } else if (!SIM_REGEX.test(formD.no_sim.trim().toUpperCase())) {
+      e.no_sim = "Format tidak valid. Contoh: SIM-001-2024";
     } else {
       const dup = drivers.find(
         (d) => d.no_sim?.toLowerCase() === formD.no_sim.trim().toLowerCase() &&
@@ -194,7 +197,11 @@ export default function ArmadaPage() {
 
   const submitDriver = async () => {
     if (!validateD()) return;
-    const body = editDriver ? { ...formD, id: editDriver.id } : formD;
+    const payload = {
+      ...formD,
+      no_sim: formD.no_sim.trim().toUpperCase(),
+    };
+    const body = editDriver ? { ...payload, id: editDriver.id } : payload;
 
     try {
       const res  = await fetch("/api/driver", {
@@ -687,13 +694,15 @@ export default function ArmadaPage() {
                 <input
                   value={formD.no_sim ?? ""}
                   onChange={(e) => {
-                    const val = e.target.value.replace(/[^a-zA-Z0-9\-]/g, "");
+                    const val = e.target.value.replace(/[^a-zA-Z0-9\-]/g, "").toUpperCase();
                     setFormD({ ...formD, no_sim: val });
                     if (errD.no_sim) setErrD({ ...errD, no_sim: undefined });
                   }}
                   className={inputCls(!!errD.no_sim)}
                   placeholder="Contoh: SIM-001-2024"
+                  maxLength={13}
                 />
+                <p className="text-gray-400 text-xs mt-1">Format: SIM-XXX-YYYY (3 digit nomor, 4 digit tahun)</p>
                 {errD.no_sim && <Err msg={errD.no_sim} />}
               </Field>
 

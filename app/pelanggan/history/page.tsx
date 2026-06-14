@@ -25,8 +25,8 @@ export default function Page() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
-  const [startDate, setStartDate] = useState("2026-02-01");
-  const [endDate, setEndDate] = useState("2026-06-30");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [shipments, setShipments] = useState<ShipmentItem[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -50,19 +50,21 @@ export default function Page() {
   }, []);
 
   const filteredShipments = useMemo(() => {
-    return shipments.filter((item) => {
-      const status = item.status_pengiriman;
-      const matchTab =
-        activeTab === "Semua" ? true :
-        activeTab === "Proses" ? ["pending", "diproses", "dalam pengiriman"].includes(status) :
-        status === "selesai";
+      if (!startDate || !endDate) return [];
 
-      const itemDate = new Date(item.tanggal_kirim).getTime();
-      const start = startDate ? new Date(startDate).getTime() : -Infinity;
-      const end   = endDate   ? new Date(endDate).getTime()   : Infinity;
+      return shipments.filter((item) => {
+        const status = item.status_pengiriman;
+        const matchTab =
+          activeTab === "Semua" ? true :
+          activeTab === "Proses" ? ["pending", "diproses", "dalam pengiriman"].includes(status) :
+          status === "selesai";
 
-      return matchTab && itemDate >= start && itemDate <= end;
-    });
+        const itemDate = new Date(item.tanggal_kirim).getTime();
+        const start = new Date(startDate).getTime();
+        const end   = new Date(endDate).getTime();
+
+        return matchTab && itemDate >= start && itemDate <= end;
+      });
   }, [shipments, activeTab, startDate, endDate]);
 
   return (
@@ -262,7 +264,9 @@ export default function Page() {
 
               {filteredShipments.length === 0 && (
                 <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
-                  Tidak ada data riwayat pada rentang tanggal ini.
+                  {!startDate || !endDate
+                    ? "Pilih tanggal mulai dan tanggal selesai untuk menampilkan data."
+                    : "Tidak ada data riwayat pada rentang tanggal ini."}
                 </div>
               )}
             </section>
