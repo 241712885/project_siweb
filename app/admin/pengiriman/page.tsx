@@ -340,15 +340,16 @@ export default function AdminPengirimanPage() {
 
             <section className="mt-6 overflow-hidden rounded-[16px] border border-slate-400 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="min-w-[920px] w-full border-collapse text-left text-sm">
+                <table className="min-w-[1050px] w-full border-collapse text-left text-sm">
                   <thead className="bg-[#D9D4D4] text-slate-800">
                     <tr>
                       <th className="px-4 py-3 font-semibold">Tanggal</th>
                       <th className="px-4 py-3 font-semibold">Resi</th>
                       <th className="px-4 py-3 font-semibold">Pengirim</th>
                       <th className="px-4 py-3 font-semibold">Penerima</th>
+                      <th className="px-4 py-3 font-semibold">Driver</th>
+                      <th className="px-4 py-3 font-semibold">Kendaraan</th>
                       <th className="px-4 py-3 font-semibold">Status</th>
-                      <th className="px-4 py-3 font-semibold">Update</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -373,14 +374,12 @@ export default function AdminPengirimanPage() {
                         <td className="px-4 py-3 text-slate-500">
                           {item.receiver}
                         </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClass(
-                              item.status
-                            )}`}
-                          >
-                            {item.status}
-                          </span>
+                        <td className="px-4 py-3 text-slate-500">
+                          {item.driverName}
+                        </td>
+                        <td className="px-4 py-3 text-slate-500">
+                          <div>{item.vehicleName}</div>
+                          <div className="text-xs text-slate-400">{item.vehiclePlate}</div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="relative inline-block">
@@ -389,7 +388,9 @@ export default function AdminPengirimanPage() {
                               onChange={(e) =>
                                 handleStatusChange(item.id, e.target.value as ShipmentStatus)
                               }
-                              className="appearance-none rounded-full border border-slate-300 bg-[#F8F8F8] px-3 py-1 pr-8 text-xs text-slate-600 outline-none"
+                              className={`appearance-none rounded-full px-3 py-1 pr-8 text-xs font-semibold outline-none cursor-pointer ${statusClass(
+                                item.status
+                              )}`}
                             >
                               {editableStatuses.map((statusItem) => (
                                 <option key={statusItem} value={statusItem}>
@@ -397,7 +398,7 @@ export default function AdminPengirimanPage() {
                                 </option>
                               ))}
                             </select>
-                            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" />
                           </div>
                         </td>
                       </tr>
@@ -406,7 +407,7 @@ export default function AdminPengirimanPage() {
                     {paginatedShipments.length === 0 && (
                       <tr>
                         <td
-                          colSpan={6}
+                          colSpan={7}
                           className="px-6 py-8 text-center text-sm text-slate-500"
                         >
                           {!startDate || !endDate

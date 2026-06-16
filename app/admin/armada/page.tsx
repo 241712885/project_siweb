@@ -458,7 +458,6 @@ export default function ArmadaPage() {
                                 >
                                   Edit
                                 </button>
-                                {/* ✅ FIX: reset deleteError saat buka konfirmasi baru */}
                                 <button
                                   onClick={() => {
                                     setDeleteError(null);
@@ -537,7 +536,6 @@ export default function ArmadaPage() {
                                 >
                                   Edit
                                 </button>
-                                {/* ✅ FIX: reset deleteError saat buka konfirmasi baru */}
                                 <button
                                   onClick={() => {
                                     setDeleteError(null);
@@ -686,8 +684,11 @@ export default function ArmadaPage() {
                   placeholder="Contoh: 081234567890"
                   maxLength={13}
                 />
-                <p className="text-gray-400 text-xs mt-1">Hanya angka, 10–13 digit</p>
-                {errD.no_telepon && <Err msg={errD.no_telepon} />}
+                {errD.no_telepon ? (
+                  <Err msg={errD.no_telepon} />
+                ) : (
+                  <p className="text-gray-400 text-xs mt-1">Hanya angka, 10–13 digit</p>
+                )}
               </Field>
 
               <Field label="No. SIM">
@@ -702,8 +703,11 @@ export default function ArmadaPage() {
                   placeholder="Contoh: SIM-001-2024"
                   maxLength={13}
                 />
-                <p className="text-gray-400 text-xs mt-1">Format: SIM-XXX-YYYY (3 digit nomor, 4 digit tahun)</p>
-                {errD.no_sim && <Err msg={errD.no_sim} />}
+                {errD.no_sim ? (
+                  <Err msg={errD.no_sim} />
+                ) : (
+                  <p className="text-gray-400 text-xs mt-1">Format: SIM-XXX-YYYY (3 digit nomor, 4 digit tahun)</p>
+                )}
               </Field>
 
               <Field label="Status">

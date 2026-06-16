@@ -111,4 +111,7 @@ export type AdminShipmentItem = {
   sender: string;
   receiver: string;
   status: ShipmentStatus;
+  driverName: string;
+  vehicleName: string;
+  vehiclePlate: string;
 };

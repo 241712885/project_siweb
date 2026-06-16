@@ -237,9 +237,9 @@ export default function AdminDashboard() {
                 <CardMoney
                   title="Total Pendapatan"
                   value={totalPendapatan}
-                  color="text-green-700"
-                  bgAccent="bg-green-50 border-green-200"
-                  icon={<DollarSign className="w-5 h-5 text-green-600" />}
+                  color="text-blue-700"
+                  bgAccent="bg-blue-50 border-blue-200"
+                  icon={<DollarSign className="w-5 h-5 text-blue-600" />}
                   highlight
                 />
               </div>
@@ -334,7 +334,7 @@ function CardMoney({
   title: string; value: number; color: string; bgAccent: string; icon: React.ReactNode; highlight?: boolean;
 }) {
   return (
-    <div className={`p-4 rounded-xl shadow border ${bgAccent} ${highlight ? "ring-2 ring-green-400" : ""}`}>
+    <div className={`p-4 rounded-xl shadow border ${bgAccent} ${highlight ? "ring-2 ring-blue-400" : ""}`}>
       <div className="flex items-center gap-2 mb-1">
         {icon}
         <p className="text-sm text-gray-600 font-medium">{title}</p>

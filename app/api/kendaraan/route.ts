@@ -96,7 +96,6 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    // ✅ Cek pesanan yang belum selesai
     const cek = await sql`
       SELECT COUNT(*) as total 
       FROM pemesanan 
@@ -110,6 +109,8 @@ export async function DELETE(req: Request) {
         { status: 400 }
       );
     }
+
+    await sql`UPDATE pemesanan SET id_kendaraan = NULL WHERE id_kendaraan = ${Number(id)}`;
 
     await sql`DELETE FROM kendaraan WHERE id = ${Number(id)}`;
     return NextResponse.json({ success: true });

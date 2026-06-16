@@ -27,8 +27,13 @@ export async function GET() {
         p.nama_pengirim,
         p.nama_penerima,
         p.status_pengiriman,
-        p.tanggal_kirim
+        p.tanggal_kirim,
+        d.nama AS nama_driver,
+        k.nama AS nama_kendaraan,
+        k.plat AS plat_nomor
       FROM pemesanan p
+      LEFT JOIN driver d ON p.id_driver = d.id
+      LEFT JOIN kendaraan k ON p.id_kendaraan = k.id
       ORDER BY p.tanggal_kirim DESC
     `;
 
@@ -39,6 +44,9 @@ export async function GET() {
       receiver: item.nama_penerima,
       status: mapStatus(item.status_pengiriman),
       date: item.tanggal_kirim,
+      driverName: item.nama_driver || "-",
+      vehicleName: item.nama_kendaraan || "-",
+      vehiclePlate: item.plat_nomor || "-",
     }));
 
     return NextResponse.json(formatted);

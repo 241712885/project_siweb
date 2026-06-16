@@ -81,6 +81,8 @@ export async function DELETE(req: Request) {
       );
     }
 
+    await sql`UPDATE pemesanan SET id_driver = NULL WHERE id_driver = ${Number(id)}`;
+
     await sql`DELETE FROM driver WHERE id = ${Number(id)}`;
     return NextResponse.json({ success: true });
 

@@ -195,7 +195,11 @@ export default function OrderManagement() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "Terjadi kesalahan, coba lagi.");
+        if (data.error?.includes("tidak terdaftar")) {
+          setShowEmailNotFound(true);
+        } else {
+          alert(data.error || "Terjadi kesalahan, coba lagi.");
+        }
         return;
       }
 
