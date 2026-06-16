@@ -27,6 +27,7 @@ export default function OrderManagement() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [kendaraans, setKendaraans] = useState<Kendaraan[]>([]);
   const [loadingDropdown, setLoadingDropdown] = useState(true);
+  const [showEmailNotFound, setShowEmailNotFound] = useState(false);
   const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "found" | "not_found">("idle");
   const router = useRouter();
 
@@ -275,7 +276,12 @@ export default function OrderManagement() {
     try {
       const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
       const data = await res.json();
-      setEmailStatus(data.exists ? "found" : "not_found");
+      if (data.exists) {
+        setEmailStatus("found");
+      } else {
+        setEmailStatus("not_found");
+        setShowEmailNotFound(true); // [TAMBAH] trigger modal
+      }
     } catch {
       setEmailStatus("idle");
     }
@@ -821,6 +827,45 @@ export default function OrderManagement() {
                 className="w-full bg-green-700 hover:bg-green-800 active:scale-95 text-white py-4 rounded-2xl text-base font-semibold shadow transition-all duration-150"
               >
                 Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEmailNotFound && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-3xl text-center w-full max-w-[360px] shadow-2xl overflow-hidden">
+            <div className="px-10 pt-10 pb-8">
+              <div className="flex items-center justify-center mx-auto mb-6 w-20 h-20 rounded-full bg-red-100">
+                <div className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-md">
+                  <svg
+                    className="w-7 h-7 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+              </div>
+
+              <h2 className="text-xl font-extrabold text-gray-900 leading-snug">
+                Email Tidak Terdaftar
+              </h2>
+
+              <p className="mt-4 text-gray-500 text-sm">
+                Email pelanggan tidak terdaftar. Minta pelanggan daftar akun terlebih dahulu.
+              </p>
+            </div>
+
+            <div className="px-6 pb-8">
+              <button
+                onClick={() => setShowEmailNotFound(false)}
+                className="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white py-4 rounded-2xl text-base font-semibold shadow transition-all duration-150"
+              >
+                Mengerti
               </button>
             </div>
           </div>

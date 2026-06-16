@@ -50,3 +50,49 @@ export async function GET() {
     );
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { id, status_pengiriman } = await req.json();
+
+    if (!id || !status_pengiriman) {
+      return NextResponse.json({ error: "ID dan status wajib diisi" }, { status: 400 });
+    }
+
+    const validStatus = ["pending", "diproses", "dalam pengiriman", "selesai"];
+    if (!validStatus.includes(status_pengiriman)) {
+      return NextResponse.json({ error: "Status tidak valid" }, { status: 400 });
+    }
+
+    const result = await sql`
+      UPDATE pemesanan
+      SET status_pengiriman = ${status_pengiriman}
+      WHERE id = ${id}
+      RETURNING id, id_driver, id_kendaraan, status_pengiriman
+    `;
+
+    if (result.length === 0) {
+      return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
+    }
+
+    const pesanan = result[0] as any;
+
+    if (status_pengiriman === "selesai") {
+      if (pesanan.id_driver) {
+        await sql`
+          UPDATE driver SET status = 'tersedia' WHERE id = ${pesanan.id_driver}
+        `;
+      }
+      if (pesanan.id_kendaraan) {
+        await sql`
+          UPDATE kendaraan SET status = 'tersedia' WHERE id = ${pesanan.id_kendaraan}
+        `;
+      }
+    }
+
+    return NextResponse.json({ success: true, data: pesanan });
+  } catch (error) {
+    console.error("PATCH pengiriman error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
