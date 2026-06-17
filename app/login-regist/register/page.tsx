@@ -65,7 +65,14 @@ export default function RegisterPage() {
       newError.phone = "Nomor telepon maksimal 15 digit";
     }
 
-    if (!form.address) newError.address = "Alamat tidak boleh kosong";
+    if (!form.address.trim()) {
+      newError.address = "Alamat pengirim wajib diisi";
+    } else if (form.address.trim().length < 10) {
+      newError.address = "Alamat minimal 10 karakter";
+    } else if (form.address.split(",").length < 3) {
+      newError.address =
+        "Format: Nama Jalan, Kota, Provinsi (contoh: Jl. Sudirman No.5, Jakarta, DKI Jakarta)";
+    }
 
     if (!form.password) {
       newError.password = "Password tidak boleh kosong";

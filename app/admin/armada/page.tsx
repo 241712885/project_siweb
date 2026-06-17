@@ -29,7 +29,7 @@ type Driver = {
 
 const STATUS_KENDARAAN = ["tersedia", "digunakan", "maintenance"];
 const STATUS_DRIVER     = ["tersedia", "bertugas", "cuti"];
-const JENIS_KENDARAAN   = ["Truk", "Pickup", "Box", "Motor"];
+const JENIS_KENDARAAN   = ["Truk", "Pickup", "Motor"];
 
 const emptyKendaraan: KendaraanForm = {
   nama_kendaraan: "",
@@ -573,7 +573,12 @@ export default function ArmadaPage() {
                   value={formK.nama_kendaraan}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, "");
-                    setFormK({ ...formK, nama_kendaraan: val });
+                    const detected = detectJenisFromNama(val);
+                    setFormK({
+                      ...formK,
+                      nama_kendaraan: val,
+                      jenis_kendaraan: detected || formK.jenis_kendaraan,
+                    });
                     if (errK.nama_kendaraan) setErrK({ ...errK, nama_kendaraan: undefined });
                   }}
                   className={inputCls(!!errK.nama_kendaraan)}
@@ -805,6 +810,14 @@ const inputCls = (hasError?: boolean) =>
       ? "border-red-400 focus:ring-red-400"
       : "border-gray-300 focus:ring-green-500"
   }`;
+
+function detectJenisFromNama(nama: string): string | null {
+  const lower = nama.toLowerCase();
+  if (lower.includes("motor")) return "Motor";
+  if (lower.includes("pickup") || lower.includes("pick up")) return "Pickup";
+  if (lower.includes("truk") || lower.includes("truck")) return "Truk";
+  return null;
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

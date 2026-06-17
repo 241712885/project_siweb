@@ -72,8 +72,10 @@ export default function AdminPengirimanPage() {
   const router = useRouter();
   const [shipments, setShipments] =
     useState<AdminShipmentItem[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const today = new Date().toISOString().slice(0, 10);
+  const firstDay = today.slice(0, 7) + "-01";
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate] = useState(today);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("Semua Status")
   const [currentPage, setCurrentPage] = useState<number>(1);
