@@ -21,12 +21,42 @@ function formatDate(date: string) {
   });
 }
 
+function statusLabel(status: string) {
+  switch (status) {
+    case "pending": return "Menunggu Pick Up";
+    case "diproses": return "Di Gudang";
+    case "dalam pengiriman": return "Dalam Pengiriman";
+    case "selesai": return "Terkirim";
+    case "dibatalkan": return "Dibatalkan";
+    default: return status;
+  }
+}
+
+function statusColorClass(status: string) {
+  switch (status) {
+    case "pending":
+      return "bg-[#FFE8B5] text-[#C28A06]";
+    case "diproses":
+      return "bg-[#FBE7D0] text-[#B5651D]";
+    case "dalam pengiriman":
+      return "bg-[#1E3A8A] text-white";
+    case "selesai":
+      return "bg-[#D9EAFE] text-[#3485F7]";
+    case "dibatalkan":
+      return "bg-[#DDF7E5] text-[#2FA85A]";
+    default:
+      return "bg-slate-100 text-slate-600";
+  }
+}
+
 export default function Page() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const today    = new Date().toISOString().slice(0, 10);
+  const firstDay = today.slice(0, 7) + "-01";
+  const [startDate, setStartDate] = useState(firstDay);
+  const [endDate, setEndDate] = useState(today);
   const [shipments, setShipments] = useState<ShipmentItem[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -57,7 +87,7 @@ export default function Page() {
         const matchTab =
           activeTab === "Semua" ? true :
           activeTab === "Proses" ? ["pending", "diproses", "dalam pengiriman"].includes(status) :
-          status === "selesai";
+          ["selesai", "dibatalkan"].includes(status);
 
         const itemDate = new Date(item.tanggal_kirim).getTime();
         const start = new Date(startDate).getTime();
@@ -223,8 +253,6 @@ export default function Page() {
 
             <section className="mt-10 space-y-6">
               {filteredShipments.map((item) => {
-                const isDelivered = item.status_pengiriman === "Terkirim";
-
                 return (
                   <div
                     key={item.id}
@@ -249,19 +277,16 @@ export default function Page() {
                       </span>
 
                       <span
-                        className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                          isDelivered
-                            ? "bg-[#D9EAFE] text-[#3485F7]"
-                            : "bg-[#FFE8B5] text-[#C28A06]"
-                        }`}
+                        className={`rounded-full px-4 py-2 text-sm font-semibold ${statusColorClass(
+                          item.status_pengiriman
+                        )}`}
                       >
-                        {item.status_pengiriman}
+                        {statusLabel(item.status_pengiriman)}
                       </span>
                     </div>
                   </div>
                 );
               })}
-
               {filteredShipments.length === 0 && (
                 <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
                   {!startDate || !endDate
