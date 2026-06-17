@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // ✅ FIX: JOIN jenis_pengiriman agar jenis_pengiriman & estimasi_hari tidak null
     const result = await sql`
       SELECT
         p.*,
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest) {
 
     if (result.length === 0) {
       return NextResponse.json(
-        { success: false, message: "Paket tidak ditemukan atau bukan milik Anda" },
+        { success: false, message: "Masukkan nomor resi yang valid. Contoh: PKT-17820601" },
         { status: 404 }
       );
     }

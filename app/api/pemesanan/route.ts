@@ -60,8 +60,7 @@ export async function POST(req: NextRequest) {
     ` as any[];
     const idJenisPengiriman = jenisList.length > 0 ? jenisList[0].id : null;
 
-    // ✅ FIX: status_transaksi sesuai metode pembayaran
-    const statusTransaksi = metode_pembayaran === "tunai" ? "lunas" : "belum bayar";
+    const statusTransaksi = "lunas";
 
     await sql`
       INSERT INTO pemesanan (
@@ -76,7 +75,8 @@ export async function POST(req: NextRequest) {
         ${receiverName}, ${receiverPhone}, ${receiverAddress},
         ${Number(weight)}, ${total}, ${metode_pembayaran},
         ${notes || null}, ${noResi}, 'pending', ${statusTransaksi},
-        CURRENT_DATE, ${idCustomer}, ${idJenisPengiriman},
+        (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::date,
+        ${idCustomer}, ${idJenisPengiriman},
         ${Number(idDriver)}, ${Number(idKendaraan)}, ${namaBarang}
       )
     `;

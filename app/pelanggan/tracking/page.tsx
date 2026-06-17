@@ -221,7 +221,7 @@ function TrackingContent() {
             value={inputResi}
             onChange={(e) => setInputResi(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLacak()}
-            placeholder="Contoh: RSI-20240601-001"
+            placeholder="Contoh: PKT-17820601"
             className="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm shadow-sm"
           />
           <button
